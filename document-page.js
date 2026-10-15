@@ -184,43 +184,101 @@ window.App = window.App || {};
     },
 
     /*
-     * Avoid html2canvas's per-word RTL positioning on Safari.
-     * Render complete Arabic sentences in a single Canvas fillText() call
-     * per line, using Cairo and the measured A4 notes positions.
+     * html2canvas on iOS can split Arabic shaping.
+     * Keep visual decoration in the first pass; draw each complete text line
+     * using native Canvas text shaping, at its CSS-computed A4 position.
      */
-    drawExportNotes(canvas, page) {
-      const notes = page.querySelector(".notes");
-      if (!notes) return;
-      const paragraphs = Array.from(notes.querySelectorAll("p"));
-      const url = notes.querySelector("a");
-      if (paragraphs.length !== 3 || !url) return;
+    exportTextSelector() {
+      return ".header-right > div, .meta-label, .meta-value, .doc-title, " +
+        ".subject-row > strong, .subject-box, .info-table th, .info-table td, " +
+        ".notes p, .notes a, .footer-center > div, .footer-right > div";
+    },
 
-      const ctx = canvas.getContext("2d");
-      if (!ctx) throw new Error("تعذّر رسم الملاحظات داخل الوثيقة");
-      const mmToPx = canvas.width / 210;
-      const cssPxToCanvas = canvas.width / page.offsetWidth;
-      // Long cargo descriptions may push the notes down to clear the table.
-      const notesShiftMm = notes.offsetTop * 210 / page.offsetWidth - 190.60;
-      const middleX = 105 * mmToPx;
-      const maxTextWidth = 164.3803 * mmToPx;
-      const baselinesMm = [194.1936, 198.5434, 202.8931];
-
-      ctx.save();
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.direction = "rtl";
-      ctx.font = `${7.7876 * 4 / 3 * cssPxToCanvas}px "Cairo", sans-serif`;
-      for (let i = 0; i < 3; i++) {
-        ctx.fillStyle = i === 2 ? "#6B7280" : "#111827";
-        // A single fillText call preserves the full Arabic shaping and order.
-        ctx.fillText(paragraphs[i].textContent.trim(), middleX,
-          (baselinesMm[i] + notesShiftMm) * mmToPx, maxTextWidth);
+    getExportTextLines(el, previewScale) {
+      const str = el.textContent.replace(/\s+/g, " ").trim();
+      if (!str) return [];
+      if (getComputedStyle(el).whiteSpace.includes("nowrap")) return [str];
+      const node = Array.from(el.childNodes).find(n => n.nodeType === 3 && n.textContent.trim())
+        || el.firstElementChild?.firstChild;
+      if (!node || node.nodeType !== 3) return [str];
+      const source = node.textContent;
+      const range = document.createRange();
+      const groups = [];
+      // Read actual browser line breaks one Unicode code point at a time.
+      // Each line is rendered in one fillText call to preserve Arabic ligatures.
+      for (let offset = 0; offset < source.length;) {
+        const char = String.fromCodePoint(source.codePointAt(offset));
+        const size = char.length;
+        range.setStart(node, offset);
+        range.setEnd(node, offset + size);
+        const rect = range.getBoundingClientRect();
+        if (rect.height) {
+          const top = rect.top / previewScale;
+          let group = groups[groups.length - 1];
+          if (!group || Math.abs(group.top - top) > 2) {
+            group = {top, characters: []};
+            groups.push(group);
+          }
+          group.characters.push(char);
+        } else if (groups.length) {
+          groups[groups.length - 1].characters.push(char);
+        }
+        offset += size;
       }
-      ctx.direction = "ltr";
-      ctx.fillStyle = "#0D6EFD";
-      ctx.font = `bold ${10.3835 * 4 / 3 * cssPxToCanvas}px "Cairo", sans-serif`;
-      ctx.fillText(url.textContent.trim(), middleX,
-        (207.933 + notesShiftMm) * mmToPx, maxTextWidth);
+      range.detach?.();
+      const lines = groups.map(g => g.characters.join("").replace(/\s+/g, " ").trim()).filter(Boolean);
+      return lines.length ? lines : [str];
+    },
+
+    paintExportText(canvas, page) {
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("تعذر إنشاء صورة الوثيقة");
+      const pageRect = page.getBoundingClientRect();
+      const previewScale = pageRect.width / page.offsetWidth || 1;
+      const rasterScale = canvas.width / page.offsetWidth;
+      ctx.save();
+      ctx.scale(rasterScale, rasterScale);
+
+      for (const el of page.querySelectorAll(this.exportTextSelector())) {
+        const value = el.textContent.trim();
+        if (!value) continue;
+        const style = getComputedStyle(el);
+        if (style.display === "none" || style.visibility === "hidden") continue;
+        const rect = el.getBoundingClientRect();
+        const x = (rect.left - pageRect.left) / previewScale;
+        const y = (rect.top - pageRect.top) / previewScale;
+        const w = rect.width / previewScale;
+        const height = rect.height / previewScale;
+        if (w < 1 || height < 1) continue;
+
+        const lines = this.getExportTextLines(el, previewScale);
+        const fontSize = parseFloat(style.fontSize) || 11;
+        const lineHeight = parseFloat(style.lineHeight) || fontSize * 1.2;
+        ctx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+        ctx.fillStyle = style.color;
+        ctx.textBaseline = "middle";
+        ctx.direction = style.direction === "rtl" ? "rtl" : "ltr";
+        const padL = parseFloat(style.paddingLeft) || 0;
+        const padR = parseFloat(style.paddingRight) || 0;
+        const usableWidth = Math.max(1, w - padL - padR);
+        const align = style.textAlign;
+        let textX;
+        if (align === "center") {
+          ctx.textAlign = "center";
+          textX = x + w / 2;
+        } else if (align === "left" || (align === "start" && ctx.direction === "ltr")
+            || (align === "end" && ctx.direction === "rtl")) {
+          ctx.textAlign = "left";
+          textX = x + padL;
+        } else {
+          ctx.textAlign = "right";
+          textX = x + w - padR;
+        }
+        const firstLine = y + height / 2 - (lines.length - 1) * lineHeight / 2;
+        lines.forEach((line, k) => {
+          ctx.fillText(line, textX, firstLine + k * lineHeight, usableWidth);
+        });
+      }
       ctx.restore();
     },
 
@@ -266,14 +324,13 @@ window.App = window.App || {};
             clonedPage.style.top = "auto";
             clonedPage.style.left = "auto";
             clonedPage.style.right = "auto";
-            // html2canvas may reposition/split RTL words on Safari.
-            // We redraw ONLY the notes as fully shaped native Canvas lines.
-            const notes = clonedPage.querySelector(".notes");
-            if (notes) notes.style.visibility = "hidden";
+            const textSelectors = App.documentPage.exportTextSelector() + ", .notes a b";
+            clonedPage.querySelectorAll(textSelectors).forEach(el =>
+              el.style.setProperty("color", "transparent", "important"));
           }
         }
       });
-      this.drawExportNotes(canvas, docElement);
+      this.paintExportText(canvas, docElement);
       return canvas;
     },
 
@@ -285,7 +342,7 @@ window.App = window.App || {};
       document.body.appendChild(link);
       link.click();
       link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 1500);
+      window.setTimeout(() => URL.revokeObjectURL(url), 60000);
     },
 
     buildExportFileBaseName() {
@@ -563,11 +620,12 @@ window.App = window.App || {};
             width: 210mm !important;
             min-height: 297mm !important;
             margin: 0 !important;
-            padding: 11mm 13mm 9mm !important;
+            padding: 0 !important;
+            height: 297mm !important;
             box-sizing: border-box;
             display: block !important;
             position: relative !important;
-            overflow: visible !important;
+            overflow: hidden !important;
             transform: none !important;
             box-shadow: none !important;
           }
