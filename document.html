@@ -435,6 +435,18 @@
       height: 28mm !important;
     }
   }
+  /* شريط الأدوات للشاشة فقط دون تغيير تخطيط الطباعة A4 */
+  @media screen {
+    .toolbar { border-radius: 10px; padding: 8px; background: rgba(255,255,255,.94); }
+    .toolbar button, .toolbar a { min-height: 44px; }
+    .toolbar button:focus-visible, .toolbar a:focus-visible { outline: 3px solid rgba(12,67,73,.35); outline-offset: 2px; }
+  }
+  @media screen and (max-width: 820px) {
+    .toolbar { border-radius: 0; padding: 8px max(8px,env(safe-area-inset-right)); }
+    .toolbar button, .toolbar a { flex: 1 1 42%; }
+    .a4-page { overflow-wrap: anywhere; }
+    .subject-box { min-width: 0; max-width: 100%; }
+  }
 </style>
 </head>
 

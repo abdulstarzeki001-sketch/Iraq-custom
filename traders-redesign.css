@@ -680,3 +680,33 @@ tr:hover td {
   th { background-color: #eee !important; color: black !important; }
   .badge { border: 1px solid #000; background: transparent !important; color: black !important; }
 }
+
+
+/* Iraq Custom • Responsive trader workspace (screen only) */
+@media screen {
+  body { background: radial-gradient(ellipse at 85% 0%,rgba(12,67,73,.07),transparent 42%),#f6f9f9; }
+  .app-header { background: linear-gradient(110deg,#093439,#0c4349 62%,#165c63); }
+  .card { border-radius: 17px; box-shadow: 0 14px 44px -36px rgba(9,52,57,.36); }
+  .nav-btn { min-height: 44px; border-radius: 9px; }
+  .btn { min-height: 44px; }
+  .mini-btn { min-height: 38px; }
+  input, select, textarea { max-width: 100%; }
+  input:focus-visible, select:focus-visible, textarea:focus-visible,
+  .nav-btn:focus-visible, .btn:focus-visible, .mini-btn:focus-visible {
+    outline: 3px solid rgba(21,116,122,.31); outline-offset: 2px;
+  }
+  .ledger-table-wrapper { overflow-x: auto; }
+}
+@media screen and (max-width: 767px) {
+  .app-header .container { gap: .8rem; }
+  .header-nav { width: 100%; display: flex; flex-wrap: wrap; gap: .4rem; }
+  .nav-btn { flex: 1 1 auto; justify-content: center; }
+  .main-container { padding: 1rem .75rem; gap: 1rem; }
+  .card { border-radius: 13px; }
+  .card-header, .card-content { padding: 1rem; }
+  .trader-card-actions { flex-wrap: wrap; }
+  .ledger-mobile-card { overflow-wrap: anywhere; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-btn,.btn,.mini-btn { transition: none !important; }
+}

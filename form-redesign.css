@@ -444,3 +444,36 @@ body {
   text-align: right;
   font: inherit;
 }
+
+
+/* Iraq Custom • Clear data-entry surfaces */
+@media screen {
+  body { background: radial-gradient(ellipse at 90% 0%,rgba(12,67,73,.065),transparent 42%),#f6f9f9; }
+  .redesign-nav { background: rgba(255,255,255,.93); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .redesign-card { border-radius: 18px; box-shadow: 0 16px 44px -34px rgba(12,67,73,.36); }
+  .card-accent { background: linear-gradient(90deg,#0c4349,#24767c); }
+  .redesign-input, .redesign-select, .redesign-textarea {
+    min-height: 46px; border-radius: 10px; transition: border-color .18s,box-shadow .18s;
+    max-width: 100%;
+  }
+  .redesign-input:focus-visible, .redesign-select:focus-visible, .redesign-textarea:focus-visible,
+  .btn-redesign:focus-visible, .nav-link:focus-visible, .qr-upload-area:focus-within {
+    outline: 3px solid rgba(21,116,122,.24); outline-offset: 2px;
+  }
+  .btn-redesign { min-height: 46px; height: auto; }
+  .qr-upload-area { position: relative; border-radius: 12px; }
+  .redesign-header { text-wrap: pretty; }
+}
+@media screen and (max-width: 767px) {
+  .nav-container { height: auto; min-height: 3.75rem; gap: .375rem; overflow-x: auto; white-space: nowrap; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .nav-container::-webkit-scrollbar { display: none; }
+  .nav-link { flex: 0 0 auto; min-height: 48px; padding: .5rem .75rem; }
+  .redesign-wrapper main { padding-left: .75rem; padding-right: .75rem; }
+  .redesign-card { border-radius: 14px; margin-bottom: 1rem; }
+  .card-header, .card-content { padding-left: 1rem; padding-right: 1rem; }
+  .driver-suggestions-head, .driver-suggestion-row { grid-template-columns: 2rem minmax(0,1fr) minmax(0,1fr) minmax(0,1fr); }
+  .driver-suggestion-row { overflow-wrap: anywhere; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .redesign-input, .redesign-select, .redesign-textarea, .btn-redesign { transition: none !important; }
+}

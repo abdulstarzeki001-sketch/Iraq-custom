@@ -507,6 +507,8 @@ window.App = window.App || {};
 
           localStorage.setItem(App.constants.TRADER_LEDGER_KEY, JSON.stringify(remainingDocs));
           localStorage.setItem(App.constants.TRADER_PAYMENT_KEY, JSON.stringify(remainingPayments));
+          App.sync?.push?.(App.constants.TRADER_LEDGER_KEY, remainingDocs);
+          App.sync?.push?.(App.constants.TRADER_PAYMENT_KEY, remainingPayments);
           this.refresh();
           App.utils.showStatus("تم مسح القيود المطابقة للتصفية الحالية", "info");
         });
