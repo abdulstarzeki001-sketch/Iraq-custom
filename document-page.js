@@ -278,60 +278,161 @@ window.App = window.App || {};
     },
 
     /*
-     * Export the unchanged A4 document as pixels embedded at exactly 210×297mm.
-     * A direct PDF avoids Safari/Chrome print scaling, page margins and reflow.
-     * If the document exceeds one page, continue at the same scale on A4 pages.
+     * Create a proper application/pdf file at the original 210 × 297 mm size.
+     * iOS Home Screen web apps don't always support FileSaver/jsPDF.save().
+     * Prepare the PDF in advance: navigator.share() needs a fresh user gesture.
      */
+    isIOSDevice() {
+      return /iPad|iPhone|iPod/i.test(navigator.userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    },
+
+    pdfName() {
+      return `${this.buildExportFileBaseName()}.pdf`;
+    },
+
+    async createPdfFile() {
+      if (!window.jspdf?.jsPDF) {
+        throw new Error("مكتبة إنشاء PDF لم تُحمّل. اتصل بالإنترنت وحدّث الصفحة.");
+      }
+      const canvas = await this.renderDocumentCanvas();
+      if (!canvas.width || !canvas.height) {
+        throw new Error("لم تكتمل صورة الوثيقة. انتظر تحميلها ثم حاول مجدداً.");
+      }
+
+      const PAGE_WIDTH_MM = 210;
+      const PAGE_HEIGHT_MM = 297;
+      const renderedHeightMm = canvas.height / canvas.width * PAGE_WIDTH_MM;
+      const pageCount = Math.max(1, Math.ceil((renderedHeightMm - 0.5) / PAGE_HEIGHT_MM));
+      const imageData = canvas.toDataURL("image/png");
+      const pdf = new window.jspdf.jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+        compress: true,
+        precision: 16
+      });
+
+      for (let i = 0; i < pageCount; i++) {
+        if (i > 0) pdf.addPage("a4", "portrait");
+        pdf.addImage(imageData, "PNG", 0, -i * PAGE_HEIGHT_MM,
+          PAGE_WIDTH_MM, renderedHeightMm, "a4-document", "FAST");
+      }
+
+      const blob = pdf.output("blob");
+      if (!blob || blob.size < 100 || !blob.type.includes("pdf")) {
+        throw new Error("تعذر إنشاء ملف PDF صالح.");
+      }
+      return new File([blob], this.pdfName(), { type: "application/pdf" });
+    },
+
+    preparePdfFile() {
+      if (this._preparedPdfFile) return Promise.resolve(this._preparedPdfFile);
+      if (this._pdfPromise) return this._pdfPromise;
+      this._pdfPromise = this.createPdfFile()
+        .then((file) => {
+          this._preparedPdfFile = file;
+          this._pdfPromise = null;
+          const button = App.dom.byId("downloadPdfBtn");
+          if (button && button.textContent.includes("جار")) {
+            button.textContent = "⬇ تنزيل PDF";
+          }
+          return file;
+        })
+        .catch((error) => {
+          this._pdfPromise = null;
+          this._pdfPreparationError = error;
+          throw error;
+        });
+      return this._pdfPromise;
+    },
+
+    showPdfOpenLink(file) {
+      // The link needs its OWN tap on iOS if native file sharing is unavailable.
+      // Opening a blob URL automatically after an await can produce "not supported".
+      const toolbar = document.querySelector(".toolbar");
+      const button = App.dom.byId("downloadPdfBtn");
+      if (!toolbar || !button) return;
+      if (this._pdfObjectUrl) URL.revokeObjectURL(this._pdfObjectUrl);
+      this._pdfObjectUrl = URL.createObjectURL(file);
+      let link = App.dom.byId("openGeneratedPdfBtn");
+      if (!link) {
+        link = document.createElement("a");
+        link.id = "openGeneratedPdfBtn";
+        link.className = "secondary";
+        link.target = "_blank";
+        link.rel = "noopener";
+        link.textContent = "📄 فتح PDF في Safari";
+        button.insertAdjacentElement("afterend", link);
+      }
+      link.href = this._pdfObjectUrl;
+      link.download = file.name;
+    },
+
+    savePdfOnDesktop(file) {
+      this.triggerBlobDownload(file, file.name);
+    },
+
     async downloadPdf() {
       if (!this.validateBeforePrint()) return;
       const button = App.dom.byId("downloadPdfBtn");
-      const originalText = button?.textContent;
+      const file = this._preparedPdfFile;
 
+      if (file) {
+        if (this.isIOSDevice()) {
+          // This is executed synchronously inside the button click, before any await.
+          // Web Share presents "Save to Files" in the native iPhone share sheet.
+          const shareData = { files: [file], title: "وثيقة الكمارك" };
+          if (typeof navigator.share === "function" &&
+              (typeof navigator.canShare !== "function" || navigator.canShare(shareData))) {
+            try {
+              await navigator.share(shareData);
+              return;
+            } catch (error) {
+              if (error?.name === "AbortError") return; // User cancelled.
+              console.warn("Native iOS PDF share unavailable:", error);
+            }
+          }
+          this.showPdfOpenLink(file);
+          window.alert("اضغط على «فتح PDF في Safari» ثم استخدم مشاركة ← حفظ في الملفات.");
+          return;
+        }
+        this.savePdfOnDesktop(file);
+        return;
+      }
+
+      if (button) {
+        button.disabled = true;
+        button.textContent = "جارٍ تجهيز PDF…";
+      }
       try {
-        if (!window.jspdf?.jsPDF) {
-          throw new Error("تعذر تحميل مكتبة إنشاء PDF. تحقق من اتصال الإنترنت ثم أعد المحاولة.");
+        const prepared = await this.preparePdfFile();
+        if (this.isIOSDevice()) {
+          // iOS requires a separate user tap for navigator.share after async work.
+          if (button) button.textContent = "✅ PDF جاهز — اضغط للحفظ";
+        } else {
+          this.savePdfOnDesktop(prepared);
+          if (button) button.textContent = "⬇ تنزيل PDF";
         }
-
-        if (button) {
-          button.disabled = true;
-          button.textContent = "جارٍ إعداد PDF…";
-        }
-
-        const canvas = await this.renderDocumentCanvas();
-        if (!canvas.width || !canvas.height) throw new Error("الوثيقة غير جاهزة للتصدير");
-
-        const PAGE_WIDTH_MM = 210;
-        const PAGE_HEIGHT_MM = 297;
-        const renderedHeightMm = (canvas.height / canvas.width) * PAGE_WIDTH_MM;
-        const pageCount = Math.max(1, Math.ceil((renderedHeightMm - 0.5) / PAGE_HEIGHT_MM));
-        const image = canvas.toDataURL("image/png");
-        const pdf = new window.jspdf.jsPDF({
-          orientation: "portrait",
-          unit: "mm",
-          format: "a4",
-          compress: true,
-          precision: 16
-        });
-
-        for (let i = 0; i < pageCount; i++) {
-          if (i > 0) pdf.addPage("a4", "portrait");
-          // Never shrink/stretch content to fit: crop only at A4 page boundaries.
-          pdf.addImage(
-            image, "PNG", 0, -i * PAGE_HEIGHT_MM,
-            PAGE_WIDTH_MM, renderedHeightMm, "a4-document", "FAST"
-          );
-        }
-
-        pdf.save(`${this.buildExportFileBaseName()}.pdf`);
       } catch (error) {
         console.error("PDF export failed", error);
-        window.alert(error?.message || "تعذر تنزيل PDF. أعد المحاولة بعد تحميل الصفحة كاملةً.");
+        window.alert(error?.message || "تعذر إنشاء PDF. تحقق من اتصال الإنترنت وأعد المحاولة.");
+        if (button) button.textContent = "⬇ إعادة محاولة PDF";
       } finally {
-        if (button) {
-          button.disabled = false;
-          button.textContent = originalText;
-        }
+        if (button) button.disabled = false;
       }
+    },
+
+    startPdfPreparation() {
+      // Don't create a PDF containing the demo/empty document.
+      if (!App.storage.hasDoc()) return;
+      const doc = App.storage.getDoc();
+      if (this.getMissingDocFields(this.printRequiredFields, doc).length) return;
+      requestAnimationFrame(() => {
+        void this.preparePdfFile().catch((error) => {
+          console.warn("PDF pre-generation deferred until user requests it:", error);
+        });
+      });
     },
 
     printLikeOriginal() {
@@ -422,6 +523,7 @@ window.App = window.App || {};
 
     bindActions() {
       this.setupViewportFit();
+      this.startPdfPreparation();
       const imageBtn = App.dom.byId("downloadImageBtn");
       if (imageBtn) {
         imageBtn.addEventListener("click", () => void this.downloadImage());
