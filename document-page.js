@@ -366,7 +366,7 @@ window.App = window.App || {};
         button.insertAdjacentElement("afterend", link);
       }
       link.href = this._pdfObjectUrl;
-      link.download = file.name;
+      // Do not set download here: iOS should preview the PDF, not reject a download.
     },
 
     savePdfOnDesktop(file) {
