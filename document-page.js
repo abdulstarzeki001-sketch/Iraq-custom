@@ -281,6 +281,9 @@ window.App = window.App || {};
         imageBtn.addEventListener("click", () => void this.downloadImage());
       }
 
+      const pdfBtn = App.dom.byId("downloadPdfBtn");
+      if (pdfBtn) pdfBtn.addEventListener("click", () => this.downloadPdf());
+
       const refreshBtn = App.dom.byId("refreshBtn");
       if (refreshBtn) {
         refreshBtn.addEventListener("click", () => location.reload());

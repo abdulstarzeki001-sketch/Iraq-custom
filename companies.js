@@ -47,22 +47,61 @@ window.App = window.App || {};
       }).slice(0, limit);
     },
 
-    async load() {
-      if (App.state.companies.length) return App.state.companies;
-
+    localCompanies() {
+      const entries = [];
       try {
-        const response = await fetch("data/companies.json");
-        if (!response.ok) throw new Error("companies.json not found");
+        if (App.storage?.hasDoc?.()) entries.push(App.storage.getDoc());
+        entries.push(...(App.storage?.getTraderLedger?.() || []));
+      } catch (error) { console.warn("Local company records unavailable", error); }
+      const unique = new Map();
+      entries.forEach((entry) => {
+        const name = String(entry?.company_name_project || "").trim();
+        const key = App.utils.normalizeSearchText(name);
+        if (!key) return;
+        if (unique.get(key)?.LicenseApprovalNumber) return;
+        unique.set(key, this.normalize({
+          Number: entry.company_number || "",
+          CompanyNameProject: name,
+          Brand: entry.brand || "",
+          LicenseApprovalNumber: entry.license_approval_number || "",
+          GovernorateName: entry.governorate_name || "",
+          GrantingLicenseApproval: entry.granting_license_approval || "",
+          LicenseApprovalDate: entry.license_approval_date || "",
+          LicenseTextSpecialization: entry.license_text_specialization || "",
+          CargoDetails: entry.cargo_typedetails || "",
+          TypeIndustryProduction: entry.item_name || "",
+          Unit: entry.unit || ""
+        }));
+      });
+      return [...unique.values()];
+    },
 
-        const data = await response.json();
-        App.state.companies = Array.isArray(data) ? data : [];
-        App.utils.showStatus(`تم تحميل ${App.state.companies.length} شركة`, "success");
-      } catch (error) {
-        console.error(error);
-        App.utils.showStatus("تعذّر تحميل قاعدة بيانات الشركات. تحقق من اتصالك بالإنترنت وأعد المحاولة.", "error");
-      }
-
-      return App.state.companies;
+    async load() {
+      if (this._loaded) return App.state.companies;
+      if (this._loading) return this._loading;
+      this._loading = (async () => {
+        try {
+          const response = await fetch("data/companies.json", { cache: "no-store" });
+          if (!response.ok) throw new Error("Missing companies database");
+          const data = await response.json();
+          if (!Array.isArray(data)) throw new Error("Invalid companies database");
+          App.state.companies = data;
+          App.utils.showStatus(`تم تحميل ${data.length} شركة من قاعدة البيانات`, "success");
+        } catch (error) {
+          App.state.companies = this.localCompanies();
+          const count = App.state.companies.length;
+          App.utils.showStatus(
+            count
+              ? `ملف الشركات غير موجود. يمكن البحث في ${count} شركة من سجلاتك المحلية فقط.`
+              : "قاعدة بيانات الشركات غير موجودة في المستودع. يمكنك إدخال الوثيقة يدوياً من صفحة التعبئة.",
+            count ? "info" : "error"
+          );
+          console.warn("Companies database unavailable; using local records only", error);
+        }
+        this._loaded = true;
+        return App.state.companies;
+      })();
+      return this._loading;
     },
 
     fillForm(company) {

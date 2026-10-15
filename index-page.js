@@ -44,10 +44,10 @@ window.App = window.App || {};
           return;
         }
 
-        results.innerHTML = list.map((company) => {
+        results.innerHTML = list.map((company, index) => {
           const normalized = App.companies.normalize(company);
           return `
-            <div class="company-result-row" data-number="${App.utils.safeText(normalized.Number)}">
+            <div class="company-result-row" data-index="${index}">
               <span class="company-result-code">رقم الشركة: ${App.utils.safeText(normalized.Number)}</span>
               <span class="company-result-name">${App.utils.safeText(normalized.CompanyNameProject)}</span>
               <span class="company-result-meta">الإجازة: ${App.utils.safeText(normalized.LicenseApprovalNumber)} — المحافظة: ${App.utils.safeText(normalized.GovernorateName)} — العلامة: ${App.utils.safeText(normalized.Brand)}</span>
@@ -55,9 +55,9 @@ window.App = window.App || {};
           `;
         }).join("");
 
-        results.querySelectorAll(".company-result-row[data-number]").forEach((row) => {
+        results.querySelectorAll(".company-result-row[data-index]").forEach((row) => {
           row.addEventListener("click", function () {
-            selectedCompany = App.companies.findByNumber(this.dataset.number);
+            selectedCompany = list[Number(this.dataset.index)] || null;
             if (!selectedCompany) return;
 
             App.storage.saveSelectedCompany(selectedCompany);

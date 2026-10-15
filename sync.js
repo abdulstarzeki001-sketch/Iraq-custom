@@ -5,20 +5,22 @@
 window.App = window.App || {};
 
 (function (App) {
-  const SYNC_TOKEN = "70525cc3f68b080d085da561681b7029b91a390fa677493e";
+  // Public frontend code must never embed a reusable cloud write credential.
+  const getSyncToken = () => String(window.IRAQ_CUSTOM_SYNC_TOKEN || "").trim();
 
   App.sync = {
     _ready: null,
 
     _headers() {
-      return {
-        "Content-Type": "application/json",
-        "X-Sync-Token": SYNC_TOKEN,
-      };
+      const headers = { "Content-Type": "application/json" };
+      const token = getSyncToken();
+      if (token) headers["X-Sync-Token"] = token;
+      return headers;
     },
 
     /** هل API السحابة متاحة؟ */
     async ready() {
+      if (!getSyncToken()) return false;
       if (this._ready !== null) return this._ready;
       try {
         const r = await fetch("/api/ping", { cache: "no-store" });
@@ -31,12 +33,15 @@ window.App = window.App || {};
 
     /** رفع مفتاح واحد إلى السحابة (fire-and-forget) */
     push(key, data) {
-      fetch("/api/data/" + encodeURIComponent(key), {
-        method: "PUT",
-        headers: this._headers(),
-        body: JSON.stringify(data),
-        cache: "no-store",
-      }).catch(function () {});
+      this.ready().then((available) => {
+        if (!available) return;
+        return fetch("/api/data/" + encodeURIComponent(key), {
+          method: "PUT",
+          headers: this._headers(),
+          body: JSON.stringify(data),
+          cache: "no-store",
+        });
+      }).catch((error) => console.warn("Cloud sync failed", error));
     },
 
     /** جلب مفتاح واحد من السحابة */

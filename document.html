@@ -9,7 +9,7 @@
 <style>
   @font-face {
     font-family: "Cairo";
-    src: url("fonts/cairo-regular.ttf") format("truetype");
+    src: url("cairo-regular.ttf") format("truetype");
     font-weight: 400;
     font-style: normal;
     font-display: swap;
@@ -17,7 +17,7 @@
 
   @font-face {
     font-family: "Cairo";
-    src: url("fonts/cairo-regular.ttf") format("truetype");
+    src: url("cairo-regular.ttf") format("truetype");
     font-weight: 500;
     font-style: normal;
     font-display: swap;
@@ -25,7 +25,7 @@
 
   @font-face {
     font-family: "Cairo";
-    src: url("fonts/cairo-regular.ttf") format("truetype");
+    src: url("cairo-regular.ttf") format("truetype");
     font-weight: 600;
     font-style: normal;
     font-display: swap;
@@ -33,7 +33,7 @@
 
   @font-face {
     font-family: "Cairo";
-    src: url("fonts/cairo-bold.ttf") format("truetype");
+    src: url("cairo-bold.ttf") format("truetype");
     font-weight: 700;
     font-style: normal;
     font-display: swap;
@@ -41,7 +41,7 @@
 
   @font-face {
     font-family: "Cairo";
-    src: url("fonts/cairo-bold.ttf") format("truetype");
+    src: url("cairo-bold.ttf") format("truetype");
     font-weight: 800;
     font-style: normal;
     font-display: swap;
@@ -443,6 +443,7 @@
 <div class="toolbar">
   <button class="primary" type="button" id="refreshBtn">🔄 تحديث الوثيقة</button>
   <button class="secondary" type="button" id="downloadImageBtn">⬇ تنزيل صورة</button>
+  <button class="secondary" type="button" id="downloadPdfBtn">طباعة / حفظ PDF</button>
   <a class="secondary" href="form.html">رجوع للتعبئة</a>
   <a class="secondary" href="index.html">شركة أخرى</a>
 </div>
@@ -458,7 +459,7 @@
 
     <div class="header-center">
       <div class="logo-ring">
-        <img src="images/iraqEagle.png" alt="شعار" class="center-logo" onerror="this.outerHTML='&lt;div class=&quot;logo-ring&quot;&gt;شعار&lt;/div&gt;'">
+        <img src="iraqEagle.png" alt="شعار" class="center-logo" onerror="this.outerHTML='&lt;div class=&quot;logo-ring&quot;&gt;شعار&lt;/div&gt;'">
       </div>
     </div>
 
@@ -538,7 +539,7 @@
   </div>
 
   <footer class="doc-footer">
-    <img src="images/Customs.jpg" class="bottom-right-logo" alt="شعار العراق" onerror="this.outerHTML=''">
+    <img src="Customs.jpg" class="bottom-right-logo" alt="شعار العراق" onerror="this.outerHTML=''">
 
     <div></div>
 
@@ -556,11 +557,11 @@
   </footer>
 
 </div>
-<script src="../cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" referrerpolicy="no-referrer"></script>
-<script src="js/core.js"></script>
-<script src="js/storage.js"></script>
-<script src="js/sync.js"></script>
-<script src="js/document-page.js"></script>
-<script src="js/app.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" referrerpolicy="no-referrer"></script>
+<script src="core.js"></script>
+<script src="storage.js"></script>
+<script src="sync.js"></script>
+<script src="document-page.js"></script>
+<script src="app.js"></script>
 
 </body></html>
