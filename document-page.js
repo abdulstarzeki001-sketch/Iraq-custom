@@ -2,6 +2,53 @@ window.App = window.App || {};
 
 (function (App) {
   App.documentPage = {
+    // Maintain the same A4 composition in portrait and landscape.
+    fitToViewport() {
+      const viewport = App.dom.byId("documentViewport");
+      const page = App.dom.byId("documentPage");
+      if (!viewport || !page || window.matchMedia("print").matches) return;
+
+      // offsetWidth and scrollHeight are the original untransformed page dimensions.
+      const originalWidth = page.offsetWidth;
+      const availableWidth = viewport.clientWidth;
+      if (!originalWidth || !availableWidth) return;
+      const scale = Math.min(1, availableWidth / originalWidth);
+
+      viewport.classList.add("is-fitted");
+      page.style.transform = `scale(${scale})`;
+      viewport.style.height = `${Math.ceil(page.scrollHeight * scale)}px`;
+    },
+
+    scheduleViewportFit() {
+      if (this._fitFrame != null) cancelAnimationFrame(this._fitFrame);
+      this._fitFrame = requestAnimationFrame(() => {
+        this._fitFrame = null;
+        this.fitToViewport();
+      });
+    },
+
+    setupViewportFit() {
+      const viewport = App.dom.byId("documentViewport");
+      const page = App.dom.byId("documentPage");
+      if (!viewport || !page) return;
+
+      this.scheduleViewportFit();
+      window.addEventListener("resize", () => this.scheduleViewportFit(), { passive: true });
+      window.addEventListener("orientationchange", () => this.scheduleViewportFit(), { passive: true });
+      window.visualViewport?.addEventListener("resize", () => this.scheduleViewportFit(), { passive: true });
+      document.fonts?.ready.then(() => this.scheduleViewportFit());
+      page.querySelectorAll("img").forEach((image) => {
+        if (!image.complete) {
+          image.addEventListener("load", () => this.scheduleViewportFit(), { once: true });
+          image.addEventListener("error", () => this.scheduleViewportFit(), { once: true });
+        }
+      });
+      if (typeof MutationObserver !== "undefined") {
+        const observer = new MutationObserver(() => this.scheduleViewportFit());
+        observer.observe(page, { childList: true, subtree: true, characterData: true });
+      }
+    },
+
     printRequiredFields: [
       { key: "doc_id", label: "رقم الوثيقة" },
       { key: "date_str", label: "تاريخ الوثيقة" },
@@ -135,7 +182,26 @@ window.App = window.App || {};
         width: docElement.scrollWidth,
         height: docElement.scrollHeight,
         windowWidth: docElement.scrollWidth,
-        windowHeight: docElement.scrollHeight
+        windowHeight: docElement.scrollHeight,
+        onclone(clonedDocument) {
+          // Export the unscaled A4 page, not the reduced phone preview.
+          const clonedViewport = clonedDocument.getElementById("documentViewport");
+          const clonedPage = clonedDocument.getElementById("documentPage");
+          if (clonedViewport) {
+            clonedViewport.classList.remove("is-fitted");
+            clonedViewport.style.height = "auto";
+            clonedViewport.style.width = "210mm";
+            clonedViewport.style.maxWidth = "none";
+            clonedViewport.style.overflow = "visible";
+          }
+          if (clonedPage) {
+            clonedPage.style.transform = "none";
+            clonedPage.style.position = "relative";
+            clonedPage.style.top = "auto";
+            clonedPage.style.left = "auto";
+            clonedPage.style.right = "auto";
+          }
+        }
       });
     },
 
@@ -276,6 +342,7 @@ window.App = window.App || {};
     },
 
     bindActions() {
+      this.setupViewportFit();
       const imageBtn = App.dom.byId("downloadImageBtn");
       if (imageBtn) {
         imageBtn.addEventListener("click", () => void this.downloadImage());
