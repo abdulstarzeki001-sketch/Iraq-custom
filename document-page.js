@@ -171,6 +171,8 @@ window.App = window.App || {};
       }
 
       await this.waitForImages(docElement);
+      // Make the captured document use the final Cairo fonts, not a fallback font.
+      if (document.fonts?.ready) await document.fonts.ready;
 
       return await window.html2canvas(docElement, {
         useCORS: true,
@@ -179,9 +181,11 @@ window.App = window.App || {};
         scale: Math.max(window.devicePixelRatio || 1, 2),
         scrollX: 0,
         scrollY: 0,
-        width: docElement.scrollWidth,
+        // The A4 page has a fixed width even when the phone preview is scaled.
+        // Do not include the scaled viewport in the exported pixel dimensions.
+        width: docElement.offsetWidth,
         height: docElement.scrollHeight,
-        windowWidth: docElement.scrollWidth,
+        windowWidth: Math.max(1024, docElement.offsetWidth),
         windowHeight: docElement.scrollHeight,
         onclone(clonedDocument) {
           // Export the unscaled A4 page, not the reduced phone preview.
@@ -252,9 +256,61 @@ window.App = window.App || {};
       }
     },
 
-    /* PDF = نفس الطباعة = مطابق 100% للشاشة */
-    downloadPdf() {
-      this.printLikeOriginal();
+    /*
+     * Export the unchanged A4 document as pixels embedded at exactly 210×297mm.
+     * A direct PDF avoids Safari/Chrome print scaling, page margins and reflow.
+     * If the document exceeds one page, continue at the same scale on A4 pages.
+     */
+    async downloadPdf() {
+      if (!this.validateBeforePrint()) return;
+      const button = App.dom.byId("downloadPdfBtn");
+      const originalText = button?.textContent;
+
+      try {
+        if (!window.jspdf?.jsPDF) {
+          throw new Error("تعذر تحميل مكتبة إنشاء PDF. تحقق من اتصال الإنترنت ثم أعد المحاولة.");
+        }
+
+        if (button) {
+          button.disabled = true;
+          button.textContent = "جارٍ إعداد PDF…";
+        }
+
+        const canvas = await this.renderDocumentCanvas();
+        if (!canvas.width || !canvas.height) throw new Error("الوثيقة غير جاهزة للتصدير");
+
+        const PAGE_WIDTH_MM = 210;
+        const PAGE_HEIGHT_MM = 297;
+        const renderedHeightMm = (canvas.height / canvas.width) * PAGE_WIDTH_MM;
+        const pageCount = Math.max(1, Math.ceil((renderedHeightMm - 0.5) / PAGE_HEIGHT_MM));
+        const image = canvas.toDataURL("image/png");
+        const pdf = new window.jspdf.jsPDF({
+          orientation: "portrait",
+          unit: "mm",
+          format: "a4",
+          compress: true,
+          precision: 16
+        });
+
+        for (let i = 0; i < pageCount; i++) {
+          if (i > 0) pdf.addPage("a4", "portrait");
+          // Never shrink/stretch content to fit: crop only at A4 page boundaries.
+          pdf.addImage(
+            image, "PNG", 0, -i * PAGE_HEIGHT_MM,
+            PAGE_WIDTH_MM, renderedHeightMm, "a4-document", "FAST"
+          );
+        }
+
+        pdf.save(`${this.buildExportFileBaseName()}.pdf`);
+      } catch (error) {
+        console.error("PDF export failed", error);
+        window.alert(error?.message || "تعذر تنزيل PDF. أعد المحاولة بعد تحميل الصفحة كاملةً.");
+      } finally {
+        if (button) {
+          button.disabled = false;
+          button.textContent = originalText;
+        }
+      }
     },
 
     printLikeOriginal() {
@@ -275,6 +331,10 @@ window.App = window.App || {};
 
       const headParts = [];
       headParts.push('<meta charset="utf-8" />');
+      // about:blank needs the original site URL to load fonts and logos.
+      const baseTag = win.document.createElement("base");
+      baseTag.href = document.baseURI;
+      headParts.push(baseTag.outerHTML);
       headParts.push("<title>طباعة الوثيقة</title>");
 
       document.querySelectorAll('link[rel="stylesheet"], link[rel="preconnect"]').forEach(function (link) {
@@ -300,16 +360,14 @@ window.App = window.App || {};
           .a4-page {
             width: 210mm !important;
             min-height: 297mm !important;
-            margin: 0 auto;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
+            margin: 0 !important;
             padding: 11mm 13mm 9mm !important;
-            overflow: hidden;
-            position: static !important;
+            box-sizing: border-box;
+            display: block !important;
+            position: relative !important;
+            overflow: visible !important;
             transform: none !important;
             box-shadow: none !important;
-            border: none !important;
           }
           .toolbar { display: none !important; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -349,7 +407,7 @@ window.App = window.App || {};
       }
 
       const pdfBtn = App.dom.byId("downloadPdfBtn");
-      if (pdfBtn) pdfBtn.addEventListener("click", () => this.downloadPdf());
+      if (pdfBtn) pdfBtn.addEventListener("click", () => void this.downloadPdf());
 
       const refreshBtn = App.dom.byId("refreshBtn");
       if (refreshBtn) {
