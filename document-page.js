@@ -2,11 +2,32 @@ window.App = window.App || {};
 
 (function (App) {
   App.documentPage = {
+    // Longer company or cargo descriptions may increase actual table row heights.
+    // Preserve the reference coordinates for normal entries; only move lower blocks
+    // when otherwise they would physically overlap the table.
+    preventContentOverlap() {
+      const page = App.dom.byId("documentPage");
+      const table = page?.querySelector(".info-table");
+      const qr = App.dom.byId("qrArea");
+      const notes = page?.querySelector(".notes");
+      if (!page || !table || !qr || !notes) return;
+
+      const pixelsPerMm = 96 / 25.4;
+      const referenceTableBottom = 154.7534 * pixelsPerMm;
+      const extraTableHeight = Math.max(0, table.offsetTop + table.offsetHeight - referenceTableBottom);
+      const offset = extraTableHeight > 1 ? extraTableHeight : 0;
+
+      qr.style.top = offset ? `calc(156.5082mm + ${offset}px)` : "";
+      notes.style.top = offset ? `calc(190.60mm + ${offset}px)` : "";
+    },
+
     // Maintain the same A4 composition in portrait and landscape.
     fitToViewport() {
       const viewport = App.dom.byId("documentViewport");
       const page = App.dom.byId("documentPage");
       if (!viewport || !page || window.matchMedia("print").matches) return;
+
+      this.preventContentOverlap();
 
       // offsetWidth and scrollHeight are the original untransformed page dimensions.
       const originalWidth = page.offsetWidth;
