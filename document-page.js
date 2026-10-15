@@ -293,7 +293,7 @@ window.App = window.App || {};
 
     async createPdfFile() {
       if (!window.jspdf?.jsPDF) {
-        throw new Error("مكتبة إنشاء PDF لم تُحمّل. اتصل بالإنترنت وحدّث الصفحة.");
+        throw new Error("تعذّر تشغيل مكتبة PDF. أغلق صفحة الوثيقة وافتحها مجدداً للتحديث.");
       }
       const canvas = await this.renderDocumentCanvas();
       if (!canvas.width || !canvas.height) {
