@@ -183,6 +183,47 @@ window.App = window.App || {};
       })));
     },
 
+    /*
+     * Avoid html2canvas's per-word RTL positioning on Safari.
+     * Render complete Arabic sentences in a single Canvas fillText() call
+     * per line, using Cairo and the measured A4 notes positions.
+     */
+    drawExportNotes(canvas, page) {
+      const notes = page.querySelector(".notes");
+      if (!notes) return;
+      const paragraphs = Array.from(notes.querySelectorAll("p"));
+      const url = notes.querySelector("a");
+      if (paragraphs.length !== 3 || !url) return;
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("تعذّر رسم الملاحظات داخل الوثيقة");
+      const mmToPx = canvas.width / 210;
+      const cssPxToCanvas = canvas.width / page.offsetWidth;
+      // Long cargo descriptions may push the notes down to clear the table.
+      const notesShiftMm = notes.offsetTop * 210 / page.offsetWidth - 190.60;
+      const middleX = 105 * mmToPx;
+      const maxTextWidth = 164.3803 * mmToPx;
+      const baselinesMm = [194.1936, 198.5434, 202.8931];
+
+      ctx.save();
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.direction = "rtl";
+      ctx.font = `${7.7876 * 4 / 3 * cssPxToCanvas}px "Cairo", sans-serif`;
+      for (let i = 0; i < 3; i++) {
+        ctx.fillStyle = i === 2 ? "#6B7280" : "#111827";
+        // A single fillText call preserves the full Arabic shaping and order.
+        ctx.fillText(paragraphs[i].textContent.trim(), middleX,
+          (baselinesMm[i] + notesShiftMm) * mmToPx, maxTextWidth);
+      }
+      ctx.direction = "ltr";
+      ctx.fillStyle = "#0D6EFD";
+      ctx.font = `bold ${10.3835 * 4 / 3 * cssPxToCanvas}px "Cairo", sans-serif`;
+      ctx.fillText(url.textContent.trim(), middleX,
+        (207.933 + notesShiftMm) * mmToPx, maxTextWidth);
+      ctx.restore();
+    },
+
     async renderDocumentCanvas() {
       const docElement = App.dom.byId("documentPage");
       if (!docElement) throw new Error("تعذر العثور على الوثيقة");
@@ -195,7 +236,7 @@ window.App = window.App || {};
       // Make the captured document use the final Cairo fonts, not a fallback font.
       if (document.fonts?.ready) await document.fonts.ready;
 
-      return await window.html2canvas(docElement, {
+      const canvas = await window.html2canvas(docElement, {
         useCORS: true,
         allowTaint: false,
         backgroundColor: "#ffffff",
@@ -225,9 +266,15 @@ window.App = window.App || {};
             clonedPage.style.top = "auto";
             clonedPage.style.left = "auto";
             clonedPage.style.right = "auto";
+            // html2canvas may reposition/split RTL words on Safari.
+            // We redraw ONLY the notes as fully shaped native Canvas lines.
+            const notes = clonedPage.querySelector(".notes");
+            if (notes) notes.style.visibility = "hidden";
           }
         }
       });
+      this.drawExportNotes(canvas, docElement);
+      return canvas;
     },
 
     triggerBlobDownload(blob, fileName) {
