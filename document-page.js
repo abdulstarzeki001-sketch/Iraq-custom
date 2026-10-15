@@ -277,6 +277,41 @@ window.App = window.App || {};
       }
     },
 
+    // Recover if Safari's installed web app blocks scripts from an external CDN.
+    // All retries use files hosted on the same Cloudflare Pages origin.
+    loadLocalExportLibrary(globalReady, path) {
+      if (globalReady()) return Promise.resolve();
+      this._libraryLoads = this._libraryLoads || {};
+      if (this._libraryLoads[path]) return this._libraryLoads[path];
+      this._libraryLoads[path] = new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = path;
+        script.async = true;
+        script.onload = () => globalReady()
+          ? resolve()
+          : reject(new Error("ملف مكتبة PDF غير صالح: " + path));
+        script.onerror = () => reject(new Error(
+          "تعذّر تحميل ملفات PDF من الموقع. أغلق التطبيق وافتح رابط الوثيقة الجديد."
+        ));
+        document.head.appendChild(script);
+      }).catch(error => {
+        delete this._libraryLoads[path];
+        throw error;
+      });
+      return this._libraryLoads[path];
+    },
+
+    async ensureExportLibraries() {
+      await this.loadLocalExportLibrary(
+        () => typeof window.html2canvas === "function",
+        "/vendor/html2canvas.min.js?v=1.4.1"
+      );
+      await this.loadLocalExportLibrary(
+        () => !!window.jspdf?.jsPDF,
+        "/vendor/jspdf.umd.min.js?v=2.5.2"
+      );
+    },
+
     /*
      * Create a proper application/pdf file at the original 210 × 297 mm size.
      * iOS Home Screen web apps don't always support FileSaver/jsPDF.save().
@@ -292,9 +327,7 @@ window.App = window.App || {};
     },
 
     async createPdfFile() {
-      if (!window.jspdf?.jsPDF) {
-        throw new Error("تعذّر تشغيل مكتبة PDF. أغلق صفحة الوثيقة وافتحها مجدداً للتحديث.");
-      }
+      await this.ensureExportLibraries();
       const canvas = await this.renderDocumentCanvas();
       if (!canvas.width || !canvas.height) {
         throw new Error("لم تكتمل صورة الوثيقة. انتظر تحميلها ثم حاول مجدداً.");
