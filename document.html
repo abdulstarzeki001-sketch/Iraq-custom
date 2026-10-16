@@ -667,38 +667,48 @@
   }
 
   /*
-   * Actual QR image bounds from the A4 reference PDF, measured from the
-   * top-left of the sheet (not from the page's content margins).
-   * Preserve the source image's own white quiet zone; no CSS frame/padding.
+   * PDF-measured QR: outer black frame and its image are separately sized.
+   * Border-box frame: X 87.676681mm, Y 156.508168mm,
+   * W 34.646577mm, H 34.570241mm, stroke 0.228954mm.
+   * Source image: X 88.287200mm, Y 157.271300mm,
+   * W 33.425544mm, H 33.196596mm (source 200x200px).
+   *
+   * Absolute-positioned children use the parent's padding edge. Therefore
+   * subtract the frame's border width from the measured outer-edge offsets.
+   * Preserve the QR file's ORIGINAL white quiet zone, without CSS padding.
    */
   .a4-page .qr-wrap {
     position: absolute;
-    left: 88.2872mm;
-    top: 157.2713mm;
-    width: 33.4255mm;
-    height: 33.1966mm;
+    left: 87.676681mm;
+    top: 156.508168mm;
+    width: 34.646577mm;
+    height: 34.570241mm;
     min-height: 0;
     margin: 0;
     padding: 0;
-    border: none;
     box-sizing: border-box;
-    background: transparent;
+    background: #fff;
+    border: 0.228954mm solid #000;
+    overflow: hidden;
     display: block;
   }
   .a4-page .barcode-box,
   .a4-page .qr-wrap .barcode-img,
   .a4-page .qr-wrap img {
-    display: block;
-    width: 33.4255mm;
-    height: 33.1966mm;
+    position: absolute;
+    left: 0.381565mm; /* 0.610519mm from outer frame minus 0.228954mm border */
+    top: 0.534178mm;  /* 0.763132mm from outer frame minus 0.228954mm border */
+    width: 33.425544mm;
+    height: 33.196596mm;
     max-width: none;
     max-height: none;
+    display: block;
     margin: 0;
     padding: 0;
-    border: none;
     box-sizing: border-box;
+    border: 0;
     object-fit: fill;
-    background: transparent;
+    background: #fff;
     image-rendering: auto;
   }
 
@@ -936,7 +946,7 @@
             </tbody>
     </table>
 
-    <div class="qr-wrap" id="qrArea"><img src="data:image/png;base64,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" alt="QR" class="barcode-img"></div>
+    <div class="qr-wrap qr-frame" id="qrArea"><img src="data:image/png;base64,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" alt="QR" class="barcode-img"></div>
 
     <div class="notes" dir="rtl" lang="ar">
       <p dir="rtl">إن احتفاظك بهذه الوثيقة يمكّنك من استخدامها لدى الجهات المرتبطة بالنظام.</p>
@@ -971,7 +981,7 @@
 <script src="storage.js"></script>
 <script src="sync.js"></script>
 <script src="/vendor/jspdf.umd.min.js?v=2.5.2"></script>
-<script src="document-page.js?v=exact-qr-20261017"></script>
+<script src="document-page.js?v=qr-border-20261017"></script>
 <script src="app.js"></script>
 
 </body></html>

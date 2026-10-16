@@ -142,7 +142,7 @@ window.App = window.App || {};
       if (qrArea) {
         const src = App.utils.getQrSrc(doc);
         if (src) {
-          qrArea.innerHTML = `<img src="${App.utils.safeText(src)}" alt="QR" class="barcode-img" crossorigin="anonymous">`;
+          qrArea.innerHTML = `<img src="${App.utils.safeText(src)}" alt="QR" class="barcode-img qr-code" crossorigin="anonymous">`;
         } else {
           qrArea.innerHTML = '<div class="qr-empty"></div>';
         }
