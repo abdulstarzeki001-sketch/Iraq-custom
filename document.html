@@ -666,33 +666,39 @@
     line-height: 1.15;
   }
 
+  /*
+   * Actual QR image bounds from the A4 reference PDF, measured from the
+   * top-left of the sheet (not from the page's content margins).
+   * Preserve the source image's own white quiet zone; no CSS frame/padding.
+   */
   .a4-page .qr-wrap {
     position: absolute;
-    top: 156.5082mm;
-    left: 87.6767mm;
-    width: 34.6466mm;
-    height: 34.5702mm;
+    left: 88.2872mm;
+    top: 157.2713mm;
+    width: 33.4255mm;
+    height: 33.1966mm;
     min-height: 0;
     margin: 0;
     padding: 0;
-    background: #fff;
-    border: 0.229mm solid #BBBBBB;
-    display: grid;
-    place-items: center;
+    border: none;
+    box-sizing: border-box;
+    background: transparent;
+    display: block;
   }
   .a4-page .barcode-box,
   .a4-page .qr-wrap .barcode-img,
   .a4-page .qr-wrap img {
+    display: block;
     width: 33.4255mm;
     height: 33.1966mm;
-    max-width: 33.4255mm;
-    max-height: 33.1966mm;
-    display: block;
+    max-width: none;
+    max-height: none;
     margin: 0;
     padding: 0;
-    border: 0;
+    border: none;
+    box-sizing: border-box;
     object-fit: fill;
-    background: #fff;
+    background: transparent;
     image-rendering: auto;
   }
 
@@ -965,7 +971,7 @@
 <script src="storage.js"></script>
 <script src="sync.js"></script>
 <script src="/vendor/jspdf.umd.min.js?v=2.5.2"></script>
-<script src="document-page.js?v=notes-reference-20261016"></script>
+<script src="document-page.js?v=exact-qr-20261017"></script>
 <script src="app.js"></script>
 
 </body></html>
