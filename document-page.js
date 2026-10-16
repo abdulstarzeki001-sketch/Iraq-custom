@@ -469,8 +469,8 @@ window.App = window.App || {};
         if (i === 0) {
           // Black outer QR frame measured from the reference PDF.
           // In jsPDF a stroke is centered on its path: offset by half its width
-          // so the OUTER edge stays at X=87.676681, Y=156.508168mm.
-          const x = 87.676681, y = 156.508168;
+          // so the OUTER edge stays at X=87.676706, Y=156.508190mm.
+          const x = 87.676706, y = 156.508190;
           const w = 34.646577, h = 34.570241, stroke = 0.228954;
           pdf.setDrawColor(0, 0, 0);
           pdf.setLineWidth(stroke);
