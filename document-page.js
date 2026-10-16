@@ -293,7 +293,7 @@ window.App = window.App || {};
       ctx.restore();
     },
 
-    async renderDocumentCanvas() {
+    async renderDocumentCanvas({ forPdf = false } = {}) {
       const docElement = App.dom.byId("documentPage");
       if (!docElement) throw new Error("تعذر العثور على الوثيقة");
 
@@ -335,6 +335,7 @@ window.App = window.App || {};
             clonedPage.style.top = "auto";
             clonedPage.style.left = "auto";
             clonedPage.style.right = "auto";
+            if (forPdf) clonedPage.classList.add("pdf-qr-vector-frame");
             const textSelectors = App.documentPage.exportTextSelector() + ", .notes a b";
             clonedPage.querySelectorAll(textSelectors).forEach(el =>
               el.style.setProperty("color", "transparent", "important"));
@@ -443,7 +444,7 @@ window.App = window.App || {};
 
     async createPdfFile() {
       await this.ensureExportLibraries();
-      const canvas = await this.renderDocumentCanvas();
+      const canvas = await this.renderDocumentCanvas({ forPdf: true });
       if (!canvas.width || !canvas.height) {
         throw new Error("لم تكتمل صورة الوثيقة. انتظر تحميلها ثم حاول مجدداً.");
       }
@@ -465,6 +466,17 @@ window.App = window.App || {};
         if (i > 0) pdf.addPage("a4", "portrait");
         pdf.addImage(imageData, "PNG", 0, -i * PAGE_HEIGHT_MM,
           PAGE_WIDTH_MM, renderedHeightMm, "a4-document", "FAST");
+        if (i === 0) {
+          // Black outer QR frame measured from the reference PDF.
+          // In jsPDF a stroke is centered on its path: offset by half its width
+          // so the OUTER edge stays at X=87.676681, Y=156.508168mm.
+          const x = 87.676681, y = 156.508168;
+          const w = 34.646577, h = 34.570241, stroke = 0.228954;
+          pdf.setDrawColor(0, 0, 0);
+          pdf.setLineWidth(stroke);
+          pdf.rect(x + stroke / 2, y + stroke / 2,
+            w - stroke, h - stroke, "S");
+        }
       }
 
       const blob = pdf.output("blob");

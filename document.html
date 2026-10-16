@@ -701,6 +701,10 @@
     pointer-events: none;
     z-index: 1;
   }
+  /* PDF output receives an exact vector border after the raster screenshot. */
+  .a4-page.pdf-qr-vector-frame .qr-wrap::after {
+    display: none !important;
+  }
   .a4-page .barcode-box,
   .a4-page .qr-wrap .barcode-img,
   .a4-page .qr-wrap img {
@@ -990,7 +994,7 @@
 <script src="storage.js"></script>
 <script src="sync.js"></script>
 <script src="/vendor/jspdf.umd.min.js?v=2.5.2"></script>
-<script src="document-page.js?v=qr-border-20261017"></script>
+<script src="document-page.js?v=qr-pdf-vector-20261017"></script>
 <script src="app.js"></script>
 
 </body></html>
