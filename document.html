@@ -673,9 +673,9 @@
    * Source image: X 88.287200mm, Y 157.271300mm,
    * W 33.425544mm, H 33.196596mm (source 200x200px).
    *
-   * Absolute-positioned children use the parent's padding edge. Therefore
-   * subtract the frame's border width from the measured outer-edge offsets.
-   * Preserve the QR file's ORIGINAL white quiet zone, without CSS padding.
+   * Draw the frame on a pseudo-element so browser integer-pixel rounding of
+   * a CSS border cannot move the QR image away from its measured coordinates.
+   * The uploaded QR image keeps its original white quiet zone without padding.
    */
   .a4-page .qr-wrap {
     position: absolute;
@@ -688,16 +688,25 @@
     padding: 0;
     box-sizing: border-box;
     background: #fff;
-    border: 0.228954mm solid #000;
+    border: 0;
     overflow: hidden;
     display: block;
+  }
+  .a4-page .qr-wrap::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 0.228954mm solid #000;
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: 1;
   }
   .a4-page .barcode-box,
   .a4-page .qr-wrap .barcode-img,
   .a4-page .qr-wrap img {
     position: absolute;
-    left: 0.381565mm; /* 0.610519mm from outer frame minus 0.228954mm border */
-    top: 0.534178mm;  /* 0.763132mm from outer frame minus 0.228954mm border */
+    left: 0.610519mm;
+    top: 0.763132mm;
     width: 33.425544mm;
     height: 33.196596mm;
     max-width: none;
