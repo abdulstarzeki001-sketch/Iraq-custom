@@ -18,7 +18,7 @@ window.App = window.App || {};
       const offset = extraTableHeight > 1 ? extraTableHeight : 0;
 
       qr.style.top = offset ? `calc(156.5082mm + ${offset}px)` : "";
-      notes.style.top = offset ? `calc(190.60mm + ${offset}px)` : "";
+      notes.style.top = offset ? `calc(190.636mm + ${offset}px)` : "";
     },
 
     // Maintain the same A4 composition in portrait and landscape.
@@ -280,7 +280,12 @@ window.App = window.App || {};
         }
         const firstLine = y + height / 2 - (lines.length - 1) * lineHeight / 2;
         lines.forEach((line, k) => {
-          ctx.fillText(line, textX, firstLine + k * lineHeight, usableWidth);
+          // Measured notes must not be compressed with canvas maxWidth.
+          if (el.closest(".notes")) {
+            ctx.fillText(line, textX, firstLine + k * lineHeight);
+          } else {
+            ctx.fillText(line, textX, firstLine + k * lineHeight, usableWidth);
+          }
         });
       }
       ctx.restore();

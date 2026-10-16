@@ -696,54 +696,79 @@
     image-rendering: auto;
   }
 
+  /*
+   * Measured PDF reference / A4 portrait / center X=105mm:
+   * first glyph starts near Y=190.636mm, text box Y=191.620mm.
+   * The three Arabic baselines are spaced by 4.350mm.
+   */
   .a4-page .notes {
     position: absolute;
-    top: 190.60mm;
-    left: 22.8099mm;
-    width: 164.3803mm;
+    top: 190.636mm;
+    left: 0;
+    width: 210mm;
+    height: auto;
     margin: 0;
     padding: 0;
-    text-align: center;
+    font-family: "Cairo", sans-serif;
     font-size: 7.7876pt;
     font-weight: 400;
-    line-height: 4.3497mm;
+    line-height: 4.350mm;
+    letter-spacing: normal;
+    direction: rtl;
+    unicode-bidi: isolate;
+    text-align: center;
     color: #111827;
   }
   .a4-page .notes p {
-    margin: 0;
-    padding: 0;
-    font-size: 7.7876pt;
-    line-height: 4.3497mm;
-  }
-  /* Each Arabic note must remain a single centered RTL line on the A4 sheet. */
-  .a4-page .notes {
-    direction: rtl;
-    unicode-bidi: isolate;
-  }
-  .a4-page .notes p {
     display: block;
-    width: 100%;
-    direction: rtl;
-    unicode-bidi: isolate;
+    height: 4.350mm;
+    margin: 0 auto;
+    padding: 0;
+    font-family: "Cairo", sans-serif;
+    font-size: 7.7876pt;
+    font-weight: 400;
+    line-height: 4.350mm;
+    letter-spacing: normal;
+    word-spacing: normal;
     white-space: nowrap;
     overflow-wrap: normal;
     word-break: normal;
-    text-align: center;
-  }
-  .a4-page .notes a {
-    display: inline-block;
-    direction: ltr;
+    direction: rtl;
     unicode-bidi: isolate;
-    white-space: nowrap;
+    text-align: center;
+    color: #111827;
+  }
+  .a4-page .notes p:nth-of-type(1) { width: 85.614mm; }
+  .a4-page .notes p:nth-of-type(2) { width: 67.867mm; }
+  .a4-page .notes p:nth-of-type(3) {
+    width: 73.328mm;
+    color: #6B7280;
   }
   .a4-page .notes .light-note { color: #6B7280; }
-  .a4-page .notes a,
-  .a4-page .notes b {
+  .a4-page .notes a {
+    display: block;
+    position: relative;
+    left: 0.1375mm;
+    width: 26.469mm;
+    height: 6.865mm;
+    margin: 0 auto;
+    padding: 0;
+    font-family: "Cairo", sans-serif;
     font-size: 10.3835pt;
-    line-height: 6.865mm;
-    color: #0D6EFD;
     font-weight: 700;
+    line-height: 6.865mm;
+    letter-spacing: normal;
+    direction: ltr;
+    unicode-bidi: isolate;
+    text-align: center;
+    white-space: nowrap;
+    color: #0D6EFD;
     text-decoration: none;
+  }
+  .a4-page .notes a b {
+    font: inherit;
+    color: inherit;
+    letter-spacing: normal;
   }
 
   .a4-page .doc-footer {
@@ -940,7 +965,7 @@
 <script src="storage.js"></script>
 <script src="sync.js"></script>
 <script src="/vendor/jspdf.umd.min.js?v=2.5.2"></script>
-<script src="document-page.js?v=pdf-scale-fix-8712e0a7"></script>
+<script src="document-page.js?v=notes-reference-20261016"></script>
 <script src="app.js"></script>
 
 </body></html>
