@@ -237,6 +237,10 @@ window.App = window.App || {};
       const previewScale = pageRect.width / page.offsetWidth || 1;
       const rasterScale = canvas.width / page.offsetWidth;
       ctx.save();
+      // html2canvas leaves its scale transform on the returned 2D context.
+      // Reset it first: otherwise scaling again multiplies the text size and
+      // position by devicePixelRatio (3x on many iPhones).
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(rasterScale, rasterScale);
 
       for (const el of page.querySelectorAll(this.exportTextSelector())) {
