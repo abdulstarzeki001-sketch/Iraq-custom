@@ -17,7 +17,7 @@ window.App = window.App || {};
       const extraTableHeight = Math.max(0, table.offsetTop + table.offsetHeight - referenceTableBottom);
       const offset = extraTableHeight > 1 ? extraTableHeight : 0;
 
-      qr.style.top = offset ? `calc(156.5082mm + ${offset}px)` : "";
+      qr.style.top = offset ? `calc(157.2713mm + ${offset}px)` : "";
       notes.style.top = offset ? `calc(190.636mm + ${offset}px)` : "";
     },
 
