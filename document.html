@@ -946,16 +946,41 @@
   }
 
 </style>
+<link rel="stylesheet" href="/document-interface.css?v=20261017-refined1" media="screen">
 </head>
 
-<body>
+<body class="document-site">
 
-<div class="toolbar">
+<header class="document-screen-header" aria-label="واجهة معاينة الوثيقة">
+  <div class="document-screen-header__inner">
+    <div class="document-screen-brand">
+      <span class="document-screen-brand__emblem" aria-hidden="true">
+        <svg width="31" height="31" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></svg>
+      </span>
+      <div>
+        <p class="document-screen-brand__eyebrow">بوابة إدارة المستندات</p>
+        <h1>معاينة الوثيقة</h1>
+        <p class="document-screen-brand__desc">راجع المعلومات بوضوح قبل حفظ الصورة أو ملف PDF.</p>
+      </div>
+    </div>
+    <div class="document-screen-meta" aria-hidden="true">
+      <span class="document-screen-chip">معاينة بتنسيق A4</span>
+      <span class="document-screen-chip document-screen-chip--neutral">210 × 297 مم</span>
+    </div>
+  </div>
+</header>
+
+<div class="toolbar" aria-label="إجراءات الوثيقة">
   <button class="primary" type="button" id="refreshBtn">🔄 تحديث الوثيقة</button>
   <button class="secondary" type="button" id="downloadImageBtn">⬇ تنزيل صورة</button>
   <button class="secondary" type="button" id="downloadPdfBtn">⬇ تنزيل PDF</button>
   <a class="secondary" href="form.html">رجوع للتعبئة</a>
   <a class="secondary" href="index.html">شركة أخرى</a>
+</div>
+
+<div class="document-preview-heading" aria-label="معلومات المعاينة">
+  <span class="document-preview-heading__title">الوثيقة الحالية</span>
+  <span class="document-preview-heading__detail">مقاس A4 · معاينة قابلة للتنزيل</span>
 </div>
 
 <div id="documentViewport" class="document-viewport">
@@ -1072,6 +1097,9 @@
 
 </div>
 </div><!-- /document-viewport -->
+<footer class="document-preview-footer">
+  <strong>للتنبيه:</strong> تحسينات هذه الصفحة تخص واجهة العرض فقط؛ قالب الوثيقة المطبوع لا يتغير.
+</footer>
 <script src="/vendor/html2canvas.min.js?v=1.4.1"></script>
 <script src="core.js"></script>
 <script src="storage.js"></script>
