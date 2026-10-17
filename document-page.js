@@ -342,6 +342,8 @@ window.App = window.App || {};
       await this.waitForImages(docElement);
       // Make the captured document use the final Cairo fonts, not a fallback font.
       if (document.fonts?.ready) await document.fonts.ready;
+      // The Cairo font can alter wrapping: re-evaluate >5 lines before export.
+      this.updateDocumentHeight();
 
       const canvas = await window.html2canvas(docElement, {
         useCORS: true,
