@@ -930,6 +930,20 @@
     }
   }
 
+  /*
+   * Exact 1mm padding on every side, only when a single cell's own
+   * rendered text uses more than five visual lines. Detected by
+   * updateLongCellPadding() after the Cairo font and document data load.
+   */
+  .a4-page .info-table td.cell-over-five-lines,
+  .a4-page .info-table #itemsBody tr td.cell-over-five-lines,
+  .a4-page .info-table #itemsBody tr:last-child td.cell-over-five-lines {
+    padding: 1mm !important;
+    box-sizing: border-box;
+    height: auto;
+    vertical-align: middle;
+  }
+
 </style>
 </head>
 
@@ -1062,7 +1076,7 @@
 <script src="storage.js"></script>
 <script src="sync.js"></script>
 <script src="/vendor/jspdf.umd.min.js?v=2.5.2"></script>
-<script src="document-page.js?v=qr-flow-20261017"></script>
+<script src="document-page.js?v=cell-padding-20261017"></script>
 <script src="app.js"></script>
 
 </body></html>
