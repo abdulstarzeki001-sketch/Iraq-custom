@@ -1,0 +1,334 @@
+/*
+ * Iraq-custom — elegant, legible DOCUMENT PAGE CHROME ONLY
+ * Every rule is screen-only and excludes the printable #documentPage.
+ * The PDF A4 page, QR, table, fonts and export logic are untouched.
+ */
+@media screen {
+  :root {
+    --doc-ink: #142a39;
+    --doc-muted: #536878;
+    --doc-primary: #0b747b;
+    --doc-primary-hover: #07555b;
+    --doc-border: #dce5ec;
+    --doc-panel: #fff;
+    --doc-warm: #dcb57b;
+  }
+  body.document-site {
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse 760px 460px at 10% 5%, rgba(23, 122, 133, .085), transparent 72%),
+      radial-gradient(ellipse 640px 420px at 95% 44%, rgba(63, 123, 173, .072), transparent 70%),
+      #f1f5f8;
+    color: var(--doc-ink);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* These components sit OUTSIDE #documentPage and never reach export. */
+  .document-screen-header {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    color: #fff;
+    background: linear-gradient(120deg, #0c2637 0%, #103a49 55%, #155265 100%);
+    border-bottom: 1px solid rgba(255,255,255,.1);
+  }
+  .document-screen-header::before {
+    content: "";
+    position: absolute;
+    inset: -75% 35% -95% -32%;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(ellipse, rgba(89, 203, 205, .19), transparent 66%);
+  }
+  .document-screen-header::after {
+    content: "";
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    left: -75px;
+    top: -190px;
+    z-index: -1;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.13);
+    box-shadow: 0 0 0 42px rgba(255,255,255,.023), 0 0 0 90px rgba(255,255,255,.019);
+    pointer-events: none;
+  }
+  .document-screen-header__inner {
+    width: min(1100px, calc(100% - 44px));
+    margin: 0 auto;
+    padding: 25px 0 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+  }
+  .document-screen-brand {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+    min-width: 0;
+  }
+  .document-screen-brand__emblem {
+    width: 59px;
+    height: 59px;
+    flex: 0 0 59px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(220,237,242,.23);
+    border-radius: 18px;
+    color: #effcff;
+    background: linear-gradient(150deg, rgba(255,255,255,.19), rgba(255,255,255,.045));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 8px 24px rgba(0,0,0,.13);
+  }
+  .document-screen-brand__eyebrow {
+    margin: 0 0 1px;
+    color: #9bd8df;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .025em;
+  }
+  .document-screen-brand h1 {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(21px, 2.9vw, 31px);
+    line-height: 1.42;
+    font-weight: 900;
+    letter-spacing: -.02em;
+  }
+  .document-screen-brand__desc {
+    margin: 2px 0 0;
+    font-size: 12.5px;
+    line-height: 1.9;
+    color: #c2d6e0;
+    font-weight: 500;
+  }
+  .document-screen-meta {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+    gap: 9px;
+    flex: 0 0 auto;
+  }
+  .document-screen-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 31px;
+    padding: 5px 13px;
+    border: 1px solid rgba(198,232,237,.2);
+    border-radius: 999px;
+    background: rgba(255,255,255,.07);
+    color: #e7f5f8;
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .document-screen-chip::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #85d7d5;
+    box-shadow: 0 0 0 3px rgba(133,215,213,.12);
+  }
+  .document-screen-chip--neutral::before {
+    background: var(--doc-warm);
+    box-shadow: 0 0 0 3px rgba(220,181,123,.13);
+  }
+
+  body.document-site > .toolbar {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: min(970px, calc(100% - 36px));
+    margin: 22px auto 16px;
+    padding: 11px;
+    gap: 9px;
+    border: 1px solid var(--doc-border);
+    border-radius: 18px;
+    background: rgba(255,255,255,.98);
+    box-shadow: 0 11px 36px rgba(26,52,69,.065), 0 2px 8px rgba(26,52,69,.04);
+  }
+  body.document-site > .toolbar button,
+  body.document-site > .toolbar a {
+    box-sizing: border-box;
+    font-family: "Cairo", Arial, sans-serif;
+    flex: 1 1 auto;
+    min-width: 125px;
+    min-height: 45px;
+    border-radius: 11px;
+    font-size: 12.7px;
+    line-height: 1.55;
+    text-align: center;
+    font-weight: 800;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 14px;
+    border: 1px solid transparent;
+    transition: background-color .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  body.document-site > .toolbar .primary {
+    color: #fff;
+    background: #174b61;
+    border-color: #174b61;
+  }
+  body.document-site > .toolbar .secondary {
+    color: #284459;
+    border-color: #e2eaf0;
+    background: #f5f8fb;
+  }
+  body.document-site > .toolbar #downloadPdfBtn {
+    color: #fff;
+    background: #0b747b;
+    border-color: #0b747b;
+    box-shadow: 0 4px 14px rgba(11,116,123,.17);
+  }
+  body.document-site > .toolbar #downloadImageBtn {
+    background: #eef5f8;
+    border-color: #d7e5eb;
+    color: #11465b;
+  }
+  body.document-site > .toolbar button:hover,
+  body.document-site > .toolbar a:hover {
+    transform: translateY(-1px);
+    border-color: #b1cdd5;
+    box-shadow: 0 7px 18px rgba(19,57,72,.095);
+  }
+  body.document-site > .toolbar #downloadPdfBtn:hover { background: #07565d; }
+  body.document-site > .toolbar button:active,
+  body.document-site > .toolbar a:active { transform: translateY(0) scale(.99); }
+  body.document-site > .toolbar :is(button,a):focus-visible {
+    outline: 3px solid rgba(9,116,125,.30);
+    outline-offset: 3px;
+  }
+  body.document-site > .toolbar :is(button,a):disabled {
+    cursor: not-allowed;
+    opacity: .55;
+    box-shadow: none;
+    transform: none;
+  }
+
+  .document-preview-heading {
+    box-sizing: border-box;
+    width: min(970px, calc(100% - 36px));
+    margin: 0 auto 9px;
+    padding: 6px 3px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--doc-muted);
+  }
+  .document-preview-heading__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-weight: 900;
+    color: #274152;
+  }
+  .document-preview-heading__title::before {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 17px;
+    border-radius: 3px;
+    background: var(--doc-primary);
+  }
+  .document-preview-heading__detail {
+    color: #69818e;
+    font-weight: 700;
+    text-align: left;
+  }
+  .document-preview-footer {
+    box-sizing: border-box;
+    width: min(970px, calc(100% - 36px));
+    margin: 10px auto 38px;
+    text-align: center;
+    color: #587180;
+    font-size: 11.5px;
+    line-height: 2;
+    font-weight: 600;
+  }
+  .document-preview-footer strong { color: #245064; }
+
+  /* Purely outer spacing; the A4 PDF's own pixel geometry is untouched. */
+  body.document-site > .document-viewport {
+    margin-top: 12px;
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 820px) {
+    .document-screen-header__inner {
+      width: calc(100% - 30px);
+      padding: 20px 0 22px;
+      gap: 12px;
+    }
+    .document-screen-brand { gap: 12px; }
+    .document-screen-brand__emblem {
+      width: 48px;
+      height: 48px;
+      flex-basis: 48px;
+      border-radius: 14px;
+    }
+    .document-screen-brand h1 { font-size: 21px; }
+    .document-screen-brand__desc { font-size: 10.5px; line-height: 1.7; }
+    .document-screen-meta { display: none; }
+    body.document-site > .toolbar {
+      width: calc(100% - 20px);
+      display: grid;
+      grid-template-columns: repeat(2,minmax(0,1fr));
+      gap: 7px;
+      margin: 13px auto 12px;
+      padding: 8px;
+      position: relative;
+      top: auto;
+      z-index: auto;
+      border: 1px solid var(--doc-border);
+      border-radius: 15px;
+      box-shadow: 0 5px 17px rgba(27,52,66,.07);
+    }
+    body.document-site > .toolbar :is(button,a) {
+      min-width: 0;
+      width: 100%;
+      min-height: 43px;
+      padding: 9px 8px;
+      font-size: 11.7px;
+      border-radius: 10px;
+      flex: unset;
+      white-space: normal;
+    }
+    body.document-site > .toolbar #downloadPdfBtn {
+      grid-column: span 2;
+      grid-row: 1;
+    }
+    .document-preview-heading {
+      width: calc(100% - 24px);
+      margin-bottom: 5px;
+      padding: 4px 2px;
+      font-size: 11px;
+    }
+    .document-preview-heading__detail { font-size: 10px; }
+    .document-preview-footer {
+      width: calc(100% - 26px);
+      margin-bottom: 28px;
+      font-size: 10px;
+    }
+  }
+  @media (max-width: 365px) {
+    .document-screen-brand__desc { max-width: 230px; }
+    body.document-site > .toolbar :is(button,a) { font-size: 10.8px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body.document-site > .toolbar :is(button,a) { transition: none; }
+    body.document-site > .toolbar :is(button,a):hover { transform: none; }
+  }
+}
