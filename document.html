@@ -667,7 +667,7 @@
   }
 
   /*
-   * PDF-measured QR: outer black frame and its image are separately sized.
+   * PDF-measured QR: soft shaded off-white outer frame and its image are separately sized.
    * Border-box frame: X 87.676706mm, Y 156.508190mm,
    * W 34.646577mm, H 34.570241mm, stroke 0.228954mm.
    * Source image: X 88.287225mm, Y 157.271322mm,
@@ -687,7 +687,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    background: #fff;
+    background: #F4F4F4;
     border: 0;
     overflow: hidden;
     display: block;
@@ -696,7 +696,8 @@
     content: "";
     position: absolute;
     inset: 0;
-    border: 0.228954mm solid #000;
+    border: 0.228954mm solid #D6D6D6;
+    box-shadow: inset 0 0 0.40mm rgba(100, 100, 100, 0.10);
     box-sizing: border-box;
     pointer-events: none;
     z-index: 1;
@@ -1076,7 +1077,7 @@
 <script src="storage.js"></script>
 <script src="sync.js"></script>
 <script src="/vendor/jspdf.umd.min.js?v=2.5.2"></script>
-<script src="document-page.js?v=cell-padding-20261017"></script>
+<script src="document-page.js?v=qr-frame-soft-white-20261017"></script>
 <script src="app.js"></script>
 
 </body></html>
