@@ -2,25 +2,33 @@ window.App = window.App || {};
 
 (function (App) {
   App.documentPage = {
-    // Longer company or cargo descriptions may increase actual table row heights.
-    // Preserve the reference coordinates for normal entries; only move lower blocks
-    // when otherwise they would physically overlap the table.
-    preventContentOverlap() {
+    // The QR is now a normal-flow sibling of the table. Its position is
+    // governed only by the table's actual height and the two CSS mm gaps.
+    // Extend the capture sheet in whole A4 pages if long text pushes the notes
+    // towards the fixed footer, so exported images/PDFs are not clipped.
+    updateDocumentHeight() {
       const page = App.dom.byId("documentPage");
-      const table = page?.querySelector(".info-table");
-      const qr = App.dom.byId("qrArea");
-      const notes = page?.querySelector(".notes");
-      if (!page || !table || !qr || !notes) return;
+      const dynamic = page?.querySelector("#documentDynamic");
+      const footer = page?.querySelector(".doc-footer");
+      if (!page || !dynamic || !footer) return;
 
-      const pixelsPerMm = 96 / 25.4;
-      const referenceTableBottom = 154.7534 * pixelsPerMm;
-      const extraTableHeight = Math.max(0, table.offsetTop + table.offsetHeight - referenceTableBottom);
-      const offset = extraTableHeight > 1 ? extraTableHeight : 0;
-
-      // The QR image must always stay at the exact reference PDF coordinates.
-      // Only the following notes can move when exceptionally long table content overflows.
-      qr.style.removeProperty("top");
-      notes.style.top = offset ? `calc(190.636mm + ${offset}px)` : "";
+      const pxPerMm = page.offsetWidth / 210;
+      if (!pxPerMm) return;
+      const contentBottomMm = (dynamic.offsetTop + dynamic.offsetHeight) / pxPerMm;
+      const footerHeightMm = footer.offsetHeight / pxPerMm;
+      const footerBaseMm = 252.2058;
+      let pages = 1;
+      // The footer belongs near the bottom of the last page. Leave room for
+      // at least 8mm below the notes and 7mm beneath the footer.
+      while (
+        (pages - 1) * 297 + footerBaseMm < contentBottomMm + 8 ||
+        (pages - 1) * 297 + footerBaseMm + footerHeightMm + 7 > pages * 297
+      ) {
+        pages += 1;
+        if (pages > 100) break;
+      }
+      page.style.height = `${pages * 297}mm`;
+      footer.style.top = `${(pages - 1) * 297 + footerBaseMm}mm`;
     },
 
     // Maintain the same A4 composition in portrait and landscape.
@@ -29,7 +37,7 @@ window.App = window.App || {};
       const page = App.dom.byId("documentPage");
       if (!viewport || !page || window.matchMedia("print").matches) return;
 
-      this.preventContentOverlap();
+      this.updateDocumentHeight();
 
       // offsetWidth and scrollHeight are the original untransformed page dimensions.
       const originalWidth = page.offsetWidth;
@@ -368,7 +376,8 @@ window.App = window.App || {};
       if (!this.validateBeforePrint()) return;
 
       try {
-        const canvas = await this.renderDocumentCanvas();
+        this.updateDocumentHeight();
+      const canvas = await this.renderDocumentCanvas();
         const fileName = `${this.buildExportFileBaseName()}.png`;
 
         if (canvas.toBlob) {
@@ -444,6 +453,22 @@ window.App = window.App || {};
 
     async createPdfFile() {
       await this.ensureExportLibraries();
+      this.updateDocumentHeight();
+      const qrContainer = App.dom.byId("qrArea");
+      const docElement = App.dom.byId("documentPage");
+      let qrFrameMm = null;
+      if (qrContainer && docElement) {
+        const pageRect = docElement.getBoundingClientRect();
+        const qrRect = qrContainer.getBoundingClientRect();
+        if (pageRect.width > 0) {
+          // Coordinates are measured relative to the full 210mm page,
+          // cancelling mobile preview scale and CSS pixel rounding.
+          qrFrameMm = {
+            x: (qrRect.left - pageRect.left) / pageRect.width * 210,
+            y: (qrRect.top - pageRect.top) / pageRect.width * 210
+          };
+        }
+      }
       const canvas = await this.renderDocumentCanvas({ forPdf: true });
       if (!canvas.width || !canvas.height) {
         throw new Error("لم تكتمل صورة الوثيقة. انتظر تحميلها ثم حاول مجدداً.");
@@ -466,11 +491,10 @@ window.App = window.App || {};
         if (i > 0) pdf.addPage("a4", "portrait");
         pdf.addImage(imageData, "PNG", 0, -i * PAGE_HEIGHT_MM,
           PAGE_WIDTH_MM, renderedHeightMm, "a4-document", "FAST");
-        if (i === 0) {
-          // Black outer QR frame measured from the reference PDF.
-          // In jsPDF a stroke is centered on its path: offset by half its width
-          // so the OUTER edge stays at X=87.676706, Y=156.508190mm.
-          const x = 87.676706, y = 156.508190;
+        if (qrFrameMm && Math.floor(qrFrameMm.y / PAGE_HEIGHT_MM) === i) {
+          // The frame follows the QR's actual position after a long table.
+          // In jsPDF stroke is centered: inset by half the border width.
+          const x = qrFrameMm.x, y = qrFrameMm.y - i * PAGE_HEIGHT_MM;
           const w = 34.646577, h = 34.570241, stroke = 0.228954;
           pdf.setDrawColor(0, 0, 0);
           pdf.setLineWidth(stroke);
@@ -644,11 +668,11 @@ window.App = window.App || {};
             min-height: 297mm !important;
             margin: 0 !important;
             padding: 0 !important;
-            height: 297mm !important;
+            height: auto !important;
             box-sizing: border-box;
             display: block !important;
             position: relative !important;
-            overflow: hidden !important;
+            overflow: visible !important;
             transform: none !important;
             box-shadow: none !important;
           }
