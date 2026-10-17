@@ -332,3 +332,10 @@
     body.document-site > .toolbar :is(button,a):hover { transform: none; }
   }
 }
+
+/* Keep the added screen chrome out of direct browser printing as well. */
+@media print {
+  .document-screen-header,
+  .document-preview-heading,
+  .document-preview-footer { display: none !important; }
+}
