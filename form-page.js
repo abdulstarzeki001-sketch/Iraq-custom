@@ -9,9 +9,7 @@ window.App = window.App || {};
       { name: "license_approval_number", label: "رقم الإجازة / الموافقة" },
       { name: "driver_name", label: "اسم السائق" },
       { name: "vehicle_number", label: "رقم العجلة" },
-      { name: "destination_governorate", label: "الوجهة النهائية / المحافظة" },
-      { name: "trader_name", label: "اسم التاجر" },
-      { name: "document_value_usd", label: "قيمة الوثيقة بالدولار" }
+      { name: "destination_governorate", label: "الوجهة النهائية / المحافظة" }
     ],
 
     optionalWarningFields: [
@@ -236,14 +234,8 @@ window.App = window.App || {};
       }
 
 
-      if (!this.hasQrFileSelected()) {
-        this.markQrFileState(true);
-        const qrFile = App.dom.byId("qr_file");
-        if (qrFile) qrFile.focus();
-
-        App.utils.showStatus("يرجى رفع صورة QR قبل إنشاء الوثيقة", "error");
-        return false;
-      }
+      // Image upload is not required on the focused form. The document
+      // renderer retains its existing QR fallback based on document data.
 
             const missingOptional = this.getMissingFields(this.optionalWarningFields);
       if (missingOptional.length) {
@@ -438,7 +430,7 @@ window.App = window.App || {};
         });
       }
 
-      App.utils.showStatus("تم استرجاع آخر مسودة محفوظة تلقائيًا. إذا كانت الوثيقة تحتاج QR، أعد رفع صورة QR لأن ملفات الرفع لا تُسترجع من المسودة", "success");
+      App.utils.showStatus("تم استرجاع مسودة البيانات. سيتم توليد رمز QR من بيانات الوثيقة عند العرض", "success");
     },
 
     scheduleAutoSave() {
@@ -885,7 +877,11 @@ window.App = window.App || {};
         const saved = App.storage.saveDoc(doc);
         if (!saved) return;
         this.saveCurrentDriver();
-        this.saveTraderTransaction(doc);
+        // The form intentionally has no trader/price fields. Do not create a
+        // blank or zero-value ledger transaction.
+        if (doc.trader_name && Number(doc.document_value_usd) > 0) {
+          this.saveTraderTransaction(doc);
+        }
         App.storage.clearDraft();
         App.storage.clearSelectedCompany();
         window.location.href = "document.html?ts=" + Date.now();

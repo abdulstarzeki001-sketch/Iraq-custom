@@ -1,0 +1,24 @@
+/* Shipment input: only fields requested by the user. */
+@media screen{
+ body.page-form .focused-card{overflow:visible!important}
+ body.page-form .focused-card .card-header{display:flex!important;gap:13px!important;align-items:center!important}
+ body.page-form .form-section-num{font-family:Arial,sans-serif;font-weight:800;font-size:13px;display:grid;place-items:center;flex:0 0 39px;width:39px;height:39px;border:1px solid #bedfe1;background:#e5f6f5;color:#087780;border-radius:12px}
+ body.page-form .form-section-desc{font-size:12px;color:#597384;line-height:1.8;margin:2px 0 0}
+ body.page-form .focused-card .form-field{min-width:0}
+ body.page-form .focused-card :is(input,select,textarea){width:100%;font-size:16px!important}
+ body.page-form .focused-card textarea{min-height:92px;resize:vertical}
+ body.page-form .licensed-quantity-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(105px,145px);gap:12px}
+ body.page-form .focused-action-bar{border-radius:16px;box-shadow:0 9px 28px rgba(19,50,66,.065)}
+ body.page-form .focused-action-bar .status-indicator{color:#496775}
+ body.page-form .focused-action-bar .btn-group{display:flex;flex-wrap:wrap;gap:9px}
+ body.page-form .focused-action-bar button{min-height:47px;font-family:inherit;font-weight:900}
+ body.page-form #status{margin-top:13px;line-height:1.9}
+ body.page-form .driver-suggestions{z-index:60;max-height:290px;overflow:auto}
+ @media(max-width:760px){
+  body.page-form .focused-card .card-header{padding:14px!important}
+  body.page-form .focused-card .card-content{padding:15px!important}
+  body.page-form .licensed-quantity-row{grid-template-columns:minmax(0,1fr) 110px;gap:8px}
+  body.page-form .focused-action-bar .btn-group{width:100%}
+  body.page-form .focused-action-bar button{flex:1 1 125px}
+ }
+}
