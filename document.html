@@ -864,6 +864,72 @@
     }
   }
 
+
+  /*
+   * QR follows actual table height instead of hard-coded page coordinates.
+   * Reference PDF gaps are measured from the TABLE bottom to the QR IMAGE
+   * top (2.518mm), and QR IMAGE bottom to NOTES block top (1.150mm).
+   * The QR outer frame has a 0.763132mm top inset / 0.610513mm bottom inset.
+   */
+  .a4-page {
+    overflow: visible;
+  }
+  .a4-page .document-dynamic {
+    position: absolute;
+    top: 64.4735mm;
+    left: 0;
+    width: 210mm;
+    height: auto;
+    display: block;
+    overflow: visible;
+  }
+  .a4-page .document-dynamic > .info-table {
+    position: static;
+    top: auto;
+    left: auto;
+    width: 164.3803mm;
+    max-width: 164.3803mm;
+    margin: 0 auto;
+    height: auto;
+  }
+  .a4-page .document-dynamic .info-table td,
+  .a4-page .document-dynamic .info-table th {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+  .a4-page .document-dynamic > .qr-wrap {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: 34.646577mm;
+    height: 34.570241mm;
+    /* IMAGE starts 0.763132mm below the outer QR wrapper. */
+    margin: calc(2.518mm - 0.763132mm) auto 0;
+    flex: none;
+  }
+  .a4-page .document-dynamic > .notes {
+    position: static;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: 210mm;
+    height: auto;
+    /* QR image ends 0.610513mm ABOVE the bottom of the frame. */
+    margin: calc(1.150mm - 0.610513mm) auto 0;
+    padding: 0;
+  }
+  @media print {
+    .a4-page {
+      height: auto !important;
+      min-height: 297mm;
+      overflow: visible !important;
+    }
+  }
+
 </style>
 </head>
 
@@ -919,6 +985,7 @@
       <span class="subject-box" data-out="subject">الوثيقة المؤقتة لبيانات الحمولة من قبل الشركة</span>
     </div>
 
+    <div class="document-dynamic" id="documentDynamic">
     <table class="info-table">
       <colgroup>
         <col class="col-right">
@@ -967,6 +1034,7 @@
       <p dir="rtl" class="light-note">لمزيد من المعلومات عن الخدمات الحكومية الإلكترونية يمكن زيارة:</p>
       <a href="https://ur.gov.iq" target="_blank" rel="noopener noreferrer"><b>https://ur.gov.iq</b></a>
     </div>
+    </div><!-- /document-dynamic -->
   </div>
 
   <footer class="doc-footer">
@@ -994,7 +1062,7 @@
 <script src="storage.js"></script>
 <script src="sync.js"></script>
 <script src="/vendor/jspdf.umd.min.js?v=2.5.2"></script>
-<script src="document-page.js?v=qr-exact-20261017"></script>
+<script src="document-page.js?v=qr-flow-20261017"></script>
 <script src="app.js"></script>
 
 </body></html>
