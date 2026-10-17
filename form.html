@@ -1,53 +1,17 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#102d40">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="كمارك العراق">
-<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="manifest" href="/site.webmanifest">
-<title>تعبئة بيانات الوثيقة | كمارك العراق</title>
-<link rel="stylesheet" href="/style.css">
-<link rel="stylesheet" href="/form-redesign.css">
-<link rel="stylesheet" href="/site-premium.css?v=20261017-signature1" media="screen">
-<link rel="stylesheet" href="/form-focused.css?v=20261017-onlyfields1" media="screen">
-</head>
-<body>
-<div class="redesign-wrapper">
-<main class="max-w-4xl mx-auto py-8 px-4">
- <header class="redesign-header">
-  <div class="header-badge">نموذج بيانات الحمولة</div>
-  <h1 class="header-title">تعبئة معلومات الوثيقة</h1>
-  <p class="header-desc">الحقول المطلوبة فقط، مرتبة حسب بيانات السائق والشركة والمنتجات.</p>
- </header>
- <form id="docForm" autocomplete="on">
-  <!-- Automatic internal metadata. Not part of the visible form. -->
-  <input type="hidden" name="doc_id" value="">
-  <input type="hidden" name="date_str" value="">
-  <input type="hidden" name="time_str" value="">
-  <input type="hidden" name="subject" value="الوثيقة المؤقتة لبيانات الحمولة من قبل الشركة">
-  <input type="hidden" name="qr_code" value="">
-  <input type="hidden" name="qr_image_data" value="">
-  <section class="redesign-card focused-card" aria-label="بيانات السيطرة والسائق والحمولة">
- <div class="card-header"><span class="form-section-num" aria-hidden="true">01</span><div><h2 class="card-title">بيانات السيطرة والسائق والحمولة</h2><p class="form-section-desc">أدخل معلومات العجلة والحمولة ووجهتها.</p></div></div>
- <div class="card-content redesign-grid"><div class="form-field"><label class="form-label" for="field-checkpoint_name_control">اسم سيطرة الدخول</label><select id="field-checkpoint_name_control" class="redesign-select" name="checkpoint_name_control" data-required-label="اسم سيطرة الدخول">
+<!DOCTYPE html><html lang="ar" dir="rtl">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"><meta name="theme-color" content="#102d40"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="كمارك العراق"><link rel="icon" href="/icon-192.png" type="image/png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><title>معلومات الوثيقة | كمارك العراق</title>
+<link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/form-redesign.css"><link rel="stylesheet" href="/site-premium.css?v=20261017-signature1" media="screen"><link rel="stylesheet" href="/form-focused.css?v=20261017-five-groups1" media="screen"></head>
+<body><div class="redesign-wrapper"><main class="max-w-4xl mx-auto py-8 px-4">
+<header class="redesign-header"><div class="header-badge">إنشاء مستند حمولة</div><h1 class="header-title">تعبئة معلومات الوثيقة</h1><p class="header-desc">حقول منظمة ضمن معلومات الوثيقة والشخصية والإجازة ورمز QR والتاجر.</p></header>
+<form id="docForm" autocomplete="on"><input type="hidden" name="subject" value="الوثيقة المؤقتة لبيانات الحمولة من قبل الشركة"><input type="hidden" name="qr_code"><input type="hidden" name="qr_image_data">
+<section class="redesign-card focused-card" aria-labelledby="section-1"><div class="card-header"><span class="form-section-num" aria-hidden="true">01</span><div><h2 id="section-1" class="card-title">معلومات الوثيقة</h2><p class="form-section-desc">رقم الوثيقة والتاريخ والوقت</p></div></div><div class="card-content redesign-grid"><div class="form-field"><label class="form-label" for="field-doc_id">رقم الوثيقة <span class="required">*</span></label><input type="text" name="doc_id" id="field-doc_id" class="redesign-input" required inputmode="numeric"></div><div class="form-field"><label class="form-label" for="field-date_str">تاريخ إنشاء الوثيقة <span class="required">*</span></label><input type="text" name="date_str" id="field-date_str" class="redesign-input" required inputmode="numeric" dir="ltr" maxlength="10" placeholder="YYYY-MM-DD"></div><div class="form-field"><label class="form-label" for="field-time_str">التوقيت <span class="required">*</span></label><input type="text" name="time_str" id="field-time_str" class="redesign-input" required inputmode="numeric" placeholder="HH:MM"></div></div></section>
+<section class="redesign-card focused-card" aria-labelledby="section-2"><div class="card-header"><span class="form-section-num" aria-hidden="true">02</span><div><h2 id="section-2" class="card-title">معلومات الشخصية</h2><p class="form-section-desc">بيانات السائق والحمولة والشركة</p></div></div><div class="card-content redesign-grid"><div class="form-field"><label class="form-label">نقطة السيطرة</label><select id="field-checkpoint_name_control" class="redesign-select" name="checkpoint_name_control" data-required-label="اسم سيطرة الدخول">
               <option value="">اختر السيطرة</option>
               <option value="سيطرة دارمان">سيطرة دارمان</option>
               <option value="سيطرة السد">سيطرة السد</option>
               <option value="سيطرة جيمن">سيطرة جيمن</option>
-            </select></div><div class="form-field col-span-full" style="position:relative">
-<label class="form-label" for="field-driver_name">اسم السائق <span class="required">*</span></label>
-<input id="field-driver_name" class="redesign-input" name="driver_name" type="text" autocomplete="off" placeholder="أدخل اسم السائق أو اختر اسماً محفوظاً" required data-required-label="اسم السائق">
-<div class="driver-suggestions" id="driverSuggestions" style="display:none">
- <div class="driver-suggestions-head">
-  <span class="driver-suggestion-col">ت</span><span class="driver-suggestion-col">اسم السائق</span><span class="driver-suggestion-col">رقم العجلة</span><span class="driver-suggestion-col">المحافظة</span>
- </div>
- <div id="driverSuggestionsBody"></div>
-</div>
-</div><div class="form-field"><label class="form-label" for="field-vehicle_number">رقم العجلة <span class="required">*</span></label><input type="text" id="field-vehicle_number" name="vehicle_number" class="redesign-input" required data-required-label="رقم العجلة" placeholder="أرقام العجلة" inputmode="numeric"></div><div class="form-field"><label class="form-label" for="field-registration_governorate">محافظة تسجيل العجلة</label><input type="text" id="field-registration_governorate" name="registration_governorate" class="redesign-input" placeholder="مثال: دهوك"></div><div class="form-field col-span-full"><label class="form-label" for="field-cargo_typedetails">نوع / تفاصيل الحمولة</label><textarea id="field-cargo_typedetails" name="cargo_typedetails" class="redesign-textarea" placeholder="اكتب تفاصيل الحمولة بدقة" rows="3"></textarea></div><div class="form-field"><label class="form-label" for="field-weight_quantity">الوزن / الكمية</label><input type="text" id="field-weight_quantity" name="weight_quantity" class="redesign-input" placeholder="الوزن أو الكمية" inputmode="decimal"></div><div class="form-field"><label class="form-label" for="field-destination_governorate">الوجهة النهائية / المحافظة <span class="required">*</span></label><select id="field-destination_governorate" class="redesign-select" name="destination_governorate" data-required-label="الوجهة النهائية / المحافظة" required="">
+            </select></div><div class="form-field col-span-full" style="position:relative"><label class="form-label" for="field-driver_name">اسم السائق <span class="required">*</span></label><input type="text" name="driver_name" id="field-driver_name" class="redesign-input" autocomplete="off" required placeholder="أدخل اسم السائق أو اختر من القائمة">
+<div class="driver-suggestions" id="driverSuggestions" style="display:none"><div class="driver-suggestions-head"><span class="driver-suggestion-col">ت</span><span class="driver-suggestion-col">اسم السائق</span><span class="driver-suggestion-col">رقم العجلة</span><span class="driver-suggestion-col">المحافظة</span></div><div id="driverSuggestionsBody"></div></div></div><div class="form-field"><label class="form-label" for="field-vehicle_number">رقم العجلة <span class="required">*</span></label><input type="text" name="vehicle_number" id="field-vehicle_number" class="redesign-input" required inputmode="numeric"></div><div class="form-field"><label class="form-label" for="field-registration_governorate">محافظة المنشأ (تسجيل العجلة)</label><input type="text" name="registration_governorate" id="field-registration_governorate" class="redesign-input"></div><div class="form-field"><label class="form-label" for="field-weight_quantity">الوزن /الكمية</label><input type="text" name="weight_quantity" id="field-weight_quantity" class="redesign-input" inputmode="decimal"></div><div class="form-field"><label class="form-label">محافظة الوجهة النهائية <span class="required">*</span></label><select id="field-destination_governorate" class="redesign-select" name="destination_governorate" data-required-label="الوجهة النهائية / المحافظة" required="">
               <option value="">اختر الوجهة النهائية</option>
               <optgroup label="محافظات العراق">
                 <option value="بغداد">بغداد</option>
@@ -69,42 +33,9 @@
                 <option value="السليمانية">السليمانية</option>
                 <option value="القادسية">القادسية</option>
               </optgroup>
-            </select></div></div>
-</section>
-<section class="redesign-card focused-card" aria-label="بيانات الشركة والإجازة">
- <div class="card-header"><span class="form-section-num" aria-hidden="true">02</span><div><h2 class="card-title">بيانات الشركة والإجازة</h2><p class="form-section-desc">المعلومات المطلوبة للشركة والموافقات.</p></div></div>
- <div class="card-content redesign-grid"><div class="form-field"><label class="form-label" for="field-governorate_name">اسم المحافظة</label><input type="text" id="field-governorate_name" name="governorate_name" class="redesign-input" placeholder="محافظة الشركة"></div><div class="form-field"><label class="form-label" for="field-company_name_project">اسم الشركة / المشروع <span class="required">*</span></label><input type="text" id="field-company_name_project" name="company_name_project" class="redesign-input" required data-required-label="اسم الشركة / المشروع" placeholder="اسم الشركة أو المشروع"></div><div class="form-field"><label class="form-label" for="field-company_type">نوع الشركة</label><input type="text" id="field-company_type" name="company_type" class="redesign-input" placeholder="نوع الشركة" autocomplete="off"></div><div class="form-field col-span-full"><label class="form-label" for="field-granting_license_approval">الجهة المانحة للإجازة / الموافقة</label><input type="text" id="field-granting_license_approval" name="granting_license_approval" class="redesign-input"></div><div class="form-field"><label class="form-label" for="field-license_approval_number">رقم الإجازة / الموافقة <span class="required">*</span></label><input type="text" id="field-license_approval_number" name="license_approval_number" class="redesign-input" required data-required-label="رقم الإجازة / الموافقة" dir="ltr"></div><div class="form-field"><label class="form-label" for="field-license_approval_date">تاريخ الإجازة / الموافقة</label><input type="text" id="field-license_approval_date" name="license_approval_date" class="redesign-input" placeholder="YYYY-MM-DD" inputmode="numeric" maxlength="10" dir="ltr"></div><div class="form-field col-span-full"><label class="form-label" for="field-license_text_specialization">منطوق الإجازة / الاختصاص</label><textarea id="field-license_text_specialization" name="license_text_specialization" class="redesign-textarea" rows="3"></textarea></div></div>
-</section>
-<section class="redesign-card focused-card" aria-label="المواد والمنتجات المرخصة">
- <div class="card-header"><span class="form-section-num" aria-hidden="true">03</span><div><h2 class="card-title">المواد والمنتجات المرخصة</h2><p class="form-section-desc">المادة والعلامة التجارية والكمية بالطن أو العدد.</p></div></div>
- <div class="card-content redesign-grid"><div class="form-field col-span-full"><label class="form-label" for="field-item_name">المواد / المنتجات المرخصة</label><textarea id="field-item_name" name="item_name" class="redesign-textarea" placeholder="أدخل اسم المادة أو تفاصيل المنتج المرخص" rows="3"></textarea></div><div class="form-field col-span-full"><label class="form-label" for="field-brand">العلامة التجارية</label><input type="text" id="field-brand" name="brand" class="redesign-input" placeholder="اسم العلامة التجارية"></div><div class="form-field col-span-full" id="productQuantityField">
-  <label class="form-label" for="field-production_capacity">المواد / المنتجات المرخصة / بالطن أو العدد</label>
-  <div class="licensed-quantity-row">
-    <input id="field-production_capacity" class="redesign-input" type="text" name="production_capacity" inputmode="decimal" placeholder="أدخل الكمية" aria-label="كمية المادة أو المنتج">
-    <select class="redesign-select" name="unit" id="field-unit" aria-label="الوحدة طن أو عدد">
-      <option value="طن">طن</option>
-      <option value="عدد">عدد</option>
-    </select>
-  </div>
-</div></div>
-</section>
-  <div class="action-bar focused-action-bar">
-   <div class="status-indicator"><span>يُنشأ رقم الوثيقة والتاريخ تلقائياً عند حفظ البيانات.</span></div>
-   <div class="btn-group">
-    <button type="button" class="btn-redesign btn-secondary-redesign" id="clearBtn">مسح الحقول</button>
-    <button type="submit" class="btn-redesign btn-primary-redesign"><span>حفظ وإظهار الوثيقة</span></button>
-   </div>
-  </div>
-  <div id="status" class="status" role="status" aria-live="polite" style="display:none"><span id="statusMessage"></span></div>
- </form>
-</main>
-</div>
-<script src="/core.js"></script>
-<script src="/storage.js"></script>
-<script src="/sync.js"></script>
-<script src="/companies.js"></script>
-<script src="/form-page.js?v=20261017-onlyfields1"></script>
-<script src="/app.js"></script>
-<script src="/site-shell.js?v=20261017-signature1" defer></script>
-</body>
-</html>
+            </select></div><div class="form-field"><label class="form-label" for="field-company_name_project">اسم الشركة <span class="required">*</span></label><input type="text" name="company_name_project" id="field-company_name_project" class="redesign-input" required></div><div class="form-field col-span-full"><label class="form-label" for="field-cargo_typedetails">نوع /تفاصيل الحمولة</label><textarea name="cargo_typedetails" id="field-cargo_typedetails" class="redesign-textarea" rows="3"></textarea></div><div class="form-field"><label class="form-label" for="field-governorate_name">اسم المحافظة</label><input type="text" name="governorate_name" id="field-governorate_name" class="redesign-input"></div></div></section>
+<section class="redesign-card focused-card" aria-labelledby="section-3"><div class="card-header"><span class="form-section-num" aria-hidden="true">03</span><div><h2 id="section-3" class="card-title">معلومات الإجازة والترخيص</h2><p class="form-section-desc">الإجازة والمواد والمنتجات المرخصة</p></div></div><div class="card-content redesign-grid"><div class="form-field col-span-full"><label class="form-label" for="field-granting_license_approval">الجهة المانحة للإجازة / الموافقة</label><input type="text" name="granting_license_approval" id="field-granting_license_approval" class="redesign-input"></div><div class="form-field"><label class="form-label" for="field-license_approval_number">رقم الإجازة / الموافقة <span class="required">*</span></label><input type="text" name="license_approval_number" id="field-license_approval_number" class="redesign-input" required dir="ltr"></div><div class="form-field"><label class="form-label" for="field-license_approval_date">تاريخ الإجازة / الموافقة</label><input type="text" name="license_approval_date" id="field-license_approval_date" class="redesign-input" dir="ltr" inputmode="numeric" maxlength="10" placeholder="YYYY-MM-DD"></div><div class="form-field col-span-full"><label class="form-label" for="field-license_text_specialization">منطوق الإجازة / الاختصاص</label><textarea name="license_text_specialization" id="field-license_text_specialization" class="redesign-textarea" rows="3"></textarea></div><div class="form-field"><label class="form-label" for="field-brand">العلامة التجارية</label><input type="text" name="brand" id="field-brand" class="redesign-input"></div><div class="form-field col-span-full"><label class="form-label" for="field-item_name">المواد / المنتجات المرخصة</label><textarea name="item_name" id="field-item_name" class="redesign-textarea" rows="3"></textarea></div><div class="form-field"><label class="form-label" for="field-company_brand">العلامة التجارية للشركة</label><input type="text" name="company_brand" id="field-company_brand" class="redesign-input"></div><div class="form-field col-span-full"><label class="form-label" for="field-product_type">نوع المنتج</label><input type="text" name="product_type" id="field-product_type" class="redesign-input"></div><div class="form-field col-span-full"><label class="form-label" for="field-production_capacity">وزن المنتج</label><div class="licensed-quantity-row"><input type="text" name="production_capacity" id="field-production_capacity" class="redesign-input" inputmode="decimal" placeholder="وزن أو عدد المنتج"><select name="unit" id="field-unit" class="redesign-select" aria-label="وحدة الوزن أو العدد"><option value="">الوحدة</option><option value="طن">طن</option><option value="عدد">عدد</option><option value="كغم">كغم</option></select></div></div></div></section>
+<section class="redesign-card focused-card" aria-labelledby="section-4"><div class="card-header"><span class="form-section-num" aria-hidden="true">04</span><div><h2 id="section-4" class="card-title">رمز الاستجابة السريعة (QR Code)</h2><p class="form-section-desc">صورة QR مطلوبة لإنشاء الوثيقة</p></div></div><div class="card-content redesign-grid"><div class="form-field col-span-full qr-file-panel"><label class="form-label" for="qr_file">قم برفع صورة QR Code (مطلوب) <span class="required">*</span></label><input type="file" name="qr_file" id="qr_file" class="redesign-input qr-file-input" accept="image/png,image/jpeg,image/webp,image/gif" required aria-required="true" aria-describedby="qr-file-hint"><p class="form-section-desc" id="qr-file-hint">ارفع صورة QR بصيغة PNG أو JPG أو WEBP قبل حفظ الوثيقة.</p></div></div></section>
+<section class="redesign-card focused-card" aria-labelledby="section-5"><div class="card-header"><span class="form-section-num" aria-hidden="true">05</span><div><h2 id="section-5" class="card-title">اسم التاجر وسعر $</h2><p class="form-section-desc">الربط مع حساب التاجر</p></div></div><div class="card-content redesign-grid"><div class="form-field col-span-full" style="position:relative"><label class="form-label" for="field-trader_name">اسم التاجر <span class="required">*</span></label><input type="text" name="trader_name" id="field-trader_name" class="redesign-input" autocomplete="off" required placeholder="اسم التاجر"><div class="driver-suggestions" id="traderSuggestions" style="display:none"><div class="driver-suggestions-head"><span class="driver-suggestion-col">ت</span><span class="driver-suggestion-col">اسم التاجر</span></div><div id="traderSuggestionsBody"></div></div></div><div class="form-field"><label class="form-label" for="field-document_value_usd">سعر $ <span class="required">*</span></label><input type="text" name="document_value_usd" id="field-document_value_usd" class="redesign-input" required inputmode="decimal" dir="ltr" placeholder="0.00"></div></div></section>
+<div class="action-bar focused-action-bar"><div class="status-indicator"><span>تأكد من صحة البيانات وارفع صورة QR قبل المتابعة.</span></div><div class="btn-group"><button type="button" class="btn-redesign btn-secondary-redesign" id="clearBtn">مسح الحقول</button><button type="submit" class="btn-redesign btn-primary-redesign">حفظ وإظهار الوثيقة</button></div></div><div id="status" class="status" role="status" aria-live="polite" style="display:none"><span id="statusMessage"></span></div></form></main></div>
+<script src="/core.js"></script><script src="/storage.js"></script><script src="/sync.js"></script><script src="/companies.js"></script><script src="/form-page.js?v=20261017-five-groups1"></script><script src="/app.js"></script><script src="/site-shell.js?v=20261017-signature1" defer></script></body></html>

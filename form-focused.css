@@ -22,3 +22,18 @@
   body.page-form .focused-action-bar button{flex:1 1 125px}
  }
 }
+
+@media screen{
+ body.page-form .focused-card .card-header{display:flex;gap:13px;align-items:center}
+ body.page-form .focused-card .redesign-grid{align-items:start}
+ body.page-form .focused-card .form-field>label{line-height:1.85}
+ body.page-form .qr-file-panel{padding:18px;border-radius:14px;background:#eef8f8;border:1px solid #cfe5e6}
+ body.page-form .qr-file-panel .form-label{font-size:14px!important;color:#164559!important}
+ body.page-form .qr-file-input{height:auto!important;min-height:58px;padding:13px!important;background:#fff!important;cursor:pointer}
+ body.page-form .qr-file-input::file-selector-button{margin-inline-end:14px;background:#0b7a82;border:0;border-radius:9px;color:#fff;padding:10px 14px;font-family:inherit;font-weight:800}
+ body.page-form .qr-file-panel p{margin-top:8px}
+ body.page-form .focused-card [name="document_value_usd"]{text-align:left;direction:ltr;font-variant-numeric:tabular-nums}
+ body.page-form .focused-card .field-error{border-color:#b91c1c!important;box-shadow:0 0 0 3px rgba(185,28,28,.12)!important}
+ body.page-form .focused-card .driver-suggestions{z-index:100;max-height:300px;overflow:auto}
+ @media(max-width:760px){body.page-form .qr-file-panel{padding:13px}body.page-form .qr-file-input{font-size:13px!important}}
+}

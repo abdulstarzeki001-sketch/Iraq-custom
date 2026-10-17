@@ -5,11 +5,14 @@ window.App = window.App || {};
     requiredFields: [
       { name: "doc_id", label: "رقم الوثيقة" },
       { name: "date_str", label: "تاريخ إنشاء الوثيقة" },
-      { name: "company_name_project", label: "اسم الشركة / المشروع" },
+      { name: "time_str", label: "التوقيت" },
+      { name: "company_name_project", label: "اسم الشركة" },
       { name: "license_approval_number", label: "رقم الإجازة / الموافقة" },
       { name: "driver_name", label: "اسم السائق" },
       { name: "vehicle_number", label: "رقم العجلة" },
-      { name: "destination_governorate", label: "الوجهة النهائية / المحافظة" }
+      { name: "destination_governorate", label: "محافظة الوجهة النهائية" },
+      { name: "trader_name", label: "اسم التاجر" },
+      { name: "document_value_usd", label: "سعر $" }
     ],
 
     optionalWarningFields: [
@@ -234,8 +237,13 @@ window.App = window.App || {};
       }
 
 
-      // Image upload is not required on the focused form. The document
-      // renderer retains its existing QR fallback based on document data.
+      if (!this.hasQrFileSelected()) {
+        this.markQrFileState(true);
+        const fileInput = App.dom.byId("qr_file");
+        fileInput?.focus();
+        App.utils.showStatus("يرجى رفع صورة QR Code قبل حفظ الوثيقة", "error");
+        return false;
+      }
 
             const missingOptional = this.getMissingFields(this.optionalWarningFields);
       if (missingOptional.length) {
@@ -259,7 +267,7 @@ window.App = window.App || {};
       const unit = App.dom.getFormValue("unit");
       const items = [];
 
-      if (itemName || productionCapacity || unit) {
+      if (itemName || productionCapacity || App.dom.getFormValue("product_type")) {
         items.push({
           item_name: itemName,
           production_capacity: productionCapacity,
@@ -289,6 +297,8 @@ window.App = window.App || {};
         license_approval_date: App.utils.normalizeDateValue(App.dom.getFormValue("license_approval_date")) || App.dom.getFormValue("license_approval_date"),
         license_text_specialization: App.dom.getFormValue("license_text_specialization"),
         brand: App.dom.getFormValue("brand"),
+        company_brand: App.dom.getFormValue("company_brand"),
+        product_type: App.dom.getFormValue("product_type"),
         trader_name: App.dom.getFormValue("trader_name"),
         document_value_usd: this.normalizeDecimalValue(App.dom.getFormValue("document_value_usd")),
         qr_code: App.dom.getFormValue("qr_code"),
@@ -324,6 +334,8 @@ window.App = window.App || {};
         license_approval_date: this.normalizeDateForInput(App.dom.getFormValue("license_approval_date")),
         license_text_specialization: App.dom.getFormValue("license_text_specialization"),
         brand: App.dom.getFormValue("brand"),
+        company_brand: App.dom.getFormValue("company_brand"),
+        product_type: App.dom.getFormValue("product_type"),
         trader_name: App.dom.getFormValue("trader_name"),
         document_value_usd: App.dom.getFormValue("document_value_usd"),
         item_name: itemName,
@@ -358,6 +370,8 @@ window.App = window.App || {};
         "license_approval_date",
         "license_text_specialization",
         "brand",
+        "company_brand",
+        "product_type",
         "trader_name",
         "document_value_usd",
         "item_name",
