@@ -528,7 +528,7 @@ window.App = window.App || {};
           // In jsPDF stroke is centered: inset by half the border width.
           const x = qrFrameMm.x, y = qrFrameMm.y - i * PAGE_HEIGHT_MM;
           const w = 34.646577, h = 34.570241, stroke = 0.228954;
-          pdf.setDrawColor(0, 0, 0);
+          pdf.setDrawColor(214, 214, 214); // #D6D6D6: shaded off-white QR frame
           pdf.setLineWidth(stroke);
           pdf.rect(x + stroke / 2, y + stroke / 2,
             w - stroke, h - stroke, "S");
