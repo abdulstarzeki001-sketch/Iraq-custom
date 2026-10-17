@@ -6,7 +6,36 @@ window.App = window.App || {};
     // governed only by the table's actual height and the two CSS mm gaps.
     // Extend the capture sheet in whole A4 pages if long text pushes the notes
     // towards the fixed footer, so exported images/PDFs are not clipped.
+
+    // Measure actual wrapped visual lines; character length is not a reliable
+    // proxy for line count with Arabic mixed with Latin product names.
+    updateLongCellPadding() {
+      const page = App.dom.byId("documentPage");
+      const cells = page?.querySelectorAll(".info-table td");
+      if (!cells?.length) return;
+
+      const range = document.createRange();
+      cells.forEach((cell) => {
+        let lines = 0;
+        if (cell.textContent.trim()) {
+          range.selectNodeContents(cell);
+          const lineTops = [];
+          for (const rect of range.getClientRects()) {
+            if (rect.width <= 0 || rect.height <= 0) continue;
+            // Bidirectional text can create several fragments on one line.
+            if (!lineTops.some((top) => Math.abs(top - rect.top) < 0.75)) {
+              lineTops.push(rect.top);
+            }
+          }
+          lines = lineTops.length;
+        }
+        cell.classList.toggle("cell-over-five-lines", lines > 5);
+      });
+      range.detach?.();
+    },
+
     updateDocumentHeight() {
+      this.updateLongCellPadding();
       const page = App.dom.byId("documentPage");
       const dynamic = page?.querySelector("#documentDynamic");
       const footer = page?.querySelector(".doc-footer");
@@ -302,6 +331,7 @@ window.App = window.App || {};
     },
 
     async renderDocumentCanvas({ forPdf = false } = {}) {
+      this.updateDocumentHeight();
       const docElement = App.dom.byId("documentPage");
       if (!docElement) throw new Error("تعذر العثور على الوثيقة");
 
