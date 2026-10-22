@@ -59,6 +59,28 @@
     margin: 0;
   }
 
+  @media screen {
+    body.document-site .toolbar .pdf-vector-primary {
+      background: #0a6870;
+      color: #fff;
+      border: 1px solid #07545b;
+      box-shadow: 0 5px 14px rgba(10, 104, 112, .18);
+    }
+    body.document-site .pdf-quality-hint {
+      width: min(850px, calc(100% - 28px));
+      margin: 10px auto 12px;
+      border: 1px solid #cde4e5;
+      border-inline-start: 4px solid #087980;
+      border-radius: 10px;
+      background: #f3fbfb;
+      padding: 11px 14px;
+      color: #214952;
+      font-size: 12px;
+      line-height: 1.9;
+      text-align: right;
+    }
+    body.document-site .pdf-quality-hint strong { color: #07545b; }
+  }
   /* Native vector PDF export: exclude site chrome, print only the real A4 document. */
   @media print {
     #site-topbar,
@@ -67,6 +89,7 @@
     .document-screen-header,
     .document-preview-heading,
     .document-preview-footer,
+    .pdf-quality-hint,
     .toolbar,
     #openGeneratedPdfBtn {
       display: none !important;
@@ -999,11 +1022,14 @@
 
 <div class="toolbar" aria-label="إجراءات الوثيقة">
   <button class="primary" type="button" id="refreshBtn">🔄 تحديث الوثيقة</button>
-  <button class="secondary" type="button" id="downloadImageBtn">⬇ تنزيل صورة</button>
-  <button class="secondary" type="button" id="downloadPdfBtn" title="تنزيل ملف PDF بدقة تصل إلى 384 DPI">⬇ تنزيل PDF عالي الدقة</button>
-  <button class="secondary" type="button" id="vectorPdfBtn" title="يحفظ النص العربي والجداول كعناصر متجهية عبر طباعة Safari">🖨 PDF متجهي (أعلى وضوح)</button>
+  <button class="primary pdf-vector-primary" type="button" id="downloadPdfBtn" title="PDF أصلي بنصوص عربية متجهية حادة وقياس A4 للطباعة">📄 حفظ PDF فائق الوضوح</button>
+  <button class="secondary" type="button" id="downloadImageBtn">⬇ تنزيل صورة PNG</button>
+  <button class="secondary" type="button" id="rasterPdfBtn" title="ملف PDF صوري بديل عند تعذر الطباعة">🖼 PDF بصورة (بديل)</button>
   <a class="secondary" href="form.html">رجوع للتعبئة</a>
   <a class="secondary" href="index.html">شركة أخرى</a>
+</div>
+<div class="pdf-quality-hint" role="note">
+  <strong>أفضل جودة للتحميل والطباعة:</strong> اضغط «حفظ PDF فائق الوضوح». على الآيفون افتح معاينة الطباعة ثم استخدم المشاركة ← حفظ في الملفات. النصوص والجداول تبقى واضحة عند التكبير.
 </div>
 
 <div class="document-preview-heading" aria-label="معلومات المعاينة">
@@ -1132,7 +1158,7 @@
 <script src="storage.js"></script>
 <script src="sync.js"></script>
 <script src="/vendor/jspdf.umd.min.js?v=2.5.2"></script>
-<script src="document-page.js?v=pdf-fullhd-vector-20261022"></script>
+<script src="document-page.js?v=pdf-native-default-20261022b"></script>
 <script src="app.js"></script>
 
 <script src="/site-shell.js?v=20261017-signature1" defer></script>
