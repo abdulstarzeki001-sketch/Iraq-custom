@@ -57,6 +57,7 @@ window.App = window.App || {};
         if (pages > 100) break;
       }
       page.style.height = `${pages * 297}mm`;
+      page.style.setProperty("--document-print-height", `${pages * 297}mm`);
       footer.style.top = `${(pages - 1) * 297 + footerBaseMm}mm`;
     },
 
@@ -330,6 +331,15 @@ window.App = window.App || {};
       ctx.restore();
     },
 
+    // A4 at 4x CSS resolution is approximately 3175 × 4490 px (384 DPI).
+    // Keep Safari below its restrictive canvas pixel limits for longer documents.
+    getExportRasterScale(element, forPdf) {
+      if (!forPdf) return Math.max(window.devicePixelRatio || 1, 2);
+      const pixelsAtOneX = Math.max(1, element.offsetWidth * element.scrollHeight);
+      const maxPixels = this.isIOSDevice() ? 15000000 : 32000000;
+      return Math.min(4, Math.sqrt(maxPixels / pixelsAtOneX));
+    },
+
     async renderDocumentCanvas({ forPdf = false } = {}) {
       this.updateDocumentHeight();
       const docElement = App.dom.byId("documentPage");
@@ -349,7 +359,7 @@ window.App = window.App || {};
         useCORS: true,
         allowTaint: false,
         backgroundColor: "#ffffff",
-        scale: Math.max(window.devicePixelRatio || 1, 2),
+        scale: this.getExportRasterScale(docElement, forPdf),
         scrollX: 0,
         scrollY: 0,
         // The A4 page has a fixed width even when the phone preview is scaled.
@@ -651,6 +661,15 @@ window.App = window.App || {};
       });
     },
 
+    // Native Safari printing keeps Cairo text and table rules as vectors,
+    // unlike the PNG-backed direct-download PDF. On iOS, select Share >
+    // Save to Files from the system PDF print preview.
+    printVectorPdf() {
+      if (!this.validateBeforePrint()) return;
+      this.updateDocumentHeight();
+      window.print();
+    },
+
     printLikeOriginal() {
       if (!this.validateBeforePrint()) return;
 
@@ -748,6 +767,9 @@ window.App = window.App || {};
 
       const pdfBtn = App.dom.byId("downloadPdfBtn");
       if (pdfBtn) pdfBtn.addEventListener("click", () => void this.downloadPdf());
+
+      const vectorPdfBtn = App.dom.byId("vectorPdfBtn");
+      if (vectorPdfBtn) vectorPdfBtn.addEventListener("click", () => this.printVectorPdf());
 
       const refreshBtn = App.dom.byId("refreshBtn");
       if (refreshBtn) {
