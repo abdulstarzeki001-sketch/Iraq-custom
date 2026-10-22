@@ -559,9 +559,9 @@ window.App = window.App || {};
         .then((file) => {
           this._preparedPdfFile = file;
           this._pdfPromise = null;
-          const button = App.dom.byId("downloadPdfBtn");
+          const button = App.dom.byId("rasterPdfBtn");
           if (button && button.textContent.includes("جار")) {
-            button.textContent = "⬇ تنزيل PDF";
+            button.textContent = "🖼 PDF بصورة (بديل)";
           }
           return file;
         })
@@ -577,7 +577,7 @@ window.App = window.App || {};
       // The link needs its OWN tap on iOS if native file sharing is unavailable.
       // Opening a blob URL automatically after an await can produce "not supported".
       const toolbar = document.querySelector(".toolbar");
-      const button = App.dom.byId("downloadPdfBtn");
+      const button = App.dom.byId("rasterPdfBtn");
       if (!toolbar || !button) return;
       if (this._pdfObjectUrl) URL.revokeObjectURL(this._pdfObjectUrl);
       this._pdfObjectUrl = URL.createObjectURL(file);
@@ -601,7 +601,7 @@ window.App = window.App || {};
 
     async downloadPdf() {
       if (!this.validateBeforePrint()) return;
-      const button = App.dom.byId("downloadPdfBtn");
+      const button = App.dom.byId("rasterPdfBtn");
       const file = this._preparedPdfFile;
 
       if (file) {
@@ -635,15 +635,15 @@ window.App = window.App || {};
         const prepared = await this.preparePdfFile();
         if (this.isIOSDevice()) {
           // iOS requires a separate user tap for navigator.share after async work.
-          if (button) button.textContent = "✅ PDF جاهز — اضغط للحفظ";
+          if (button) button.textContent = "✅ الملف الصوري جاهز — اضغط للحفظ";
         } else {
           this.savePdfOnDesktop(prepared);
-          if (button) button.textContent = "⬇ تنزيل PDF";
+          if (button) button.textContent = "🖼 PDF بصورة (بديل)";
         }
       } catch (error) {
         console.error("PDF export failed", error);
         window.alert(error?.message || "تعذر إنشاء PDF. تحقق من اتصال الإنترنت وأعد المحاولة.");
-        if (button) button.textContent = "⬇ إعادة محاولة PDF";
+        if (button) button.textContent = "🖼 إعادة تنزيل PDF الصوري";
       } finally {
         if (button) button.disabled = false;
       }
@@ -667,7 +667,17 @@ window.App = window.App || {};
     printVectorPdf() {
       if (!this.validateBeforePrint()) return;
       this.updateDocumentHeight();
+      // The native browser print pipeline preserves scalable Arabic text.
+      // Do not await html2canvas: Safari requires a direct user gesture.
+      const previousTitle = document.title;
+      document.title = this.pdfName().replace(/\.pdf$/i, "");
+      const restoreTitle = () => {
+        document.title = previousTitle;
+        window.removeEventListener("afterprint", restoreTitle);
+      };
+      window.addEventListener("afterprint", restoreTitle, { once: true });
       window.print();
+      window.setTimeout(restoreTitle, 30000);
     },
 
     printLikeOriginal() {
@@ -759,17 +769,17 @@ window.App = window.App || {};
 
     bindActions() {
       this.setupViewportFit();
-      this.startPdfPreparation();
+      // Native vector printing avoids expensive background rasterization.
       const imageBtn = App.dom.byId("downloadImageBtn");
       if (imageBtn) {
         imageBtn.addEventListener("click", () => void this.downloadImage());
       }
 
       const pdfBtn = App.dom.byId("downloadPdfBtn");
-      if (pdfBtn) pdfBtn.addEventListener("click", () => void this.downloadPdf());
+      if (pdfBtn) pdfBtn.addEventListener("click", () => this.printVectorPdf());
 
-      const vectorPdfBtn = App.dom.byId("vectorPdfBtn");
-      if (vectorPdfBtn) vectorPdfBtn.addEventListener("click", () => this.printVectorPdf());
+      const rasterPdfBtn = App.dom.byId("rasterPdfBtn");
+      if (rasterPdfBtn) rasterPdfBtn.addEventListener("click", () => void this.downloadPdf());
 
       const refreshBtn = App.dom.byId("refreshBtn");
       if (refreshBtn) {
