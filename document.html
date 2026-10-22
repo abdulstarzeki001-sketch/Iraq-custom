@@ -59,6 +59,29 @@
     margin: 0;
   }
 
+  /* Native vector PDF export: exclude site chrome, print only the real A4 document. */
+  @media print {
+    .document-screen-header,
+    .document-preview-heading,
+    .document-preview-footer,
+    .toolbar,
+    #openGeneratedPdfBtn {
+      display: none !important;
+    }
+    html, body.document-site {
+      margin: 0 !important;
+      padding: 0 !important;
+      background: #fff !important;
+    }
+    #documentViewport {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    #documentPage {
+      height: var(--document-print-height, 297mm) !important;
+    }
+  }
+
   * {
     box-sizing: border-box;
     -webkit-print-color-adjust: exact;
@@ -974,7 +997,8 @@
 <div class="toolbar" aria-label="إجراءات الوثيقة">
   <button class="primary" type="button" id="refreshBtn">🔄 تحديث الوثيقة</button>
   <button class="secondary" type="button" id="downloadImageBtn">⬇ تنزيل صورة</button>
-  <button class="secondary" type="button" id="downloadPdfBtn">⬇ تنزيل PDF</button>
+  <button class="secondary" type="button" id="downloadPdfBtn" title="تنزيل ملف PDF بدقة تصل إلى 384 DPI">⬇ تنزيل PDF عالي الدقة</button>
+  <button class="secondary" type="button" id="vectorPdfBtn" title="يحفظ النص العربي والجداول كعناصر متجهية عبر طباعة Safari">🖨 PDF متجهي (أعلى وضوح)</button>
   <a class="secondary" href="form.html">رجوع للتعبئة</a>
   <a class="secondary" href="index.html">شركة أخرى</a>
 </div>
@@ -1105,7 +1129,7 @@
 <script src="storage.js"></script>
 <script src="sync.js"></script>
 <script src="/vendor/jspdf.umd.min.js?v=2.5.2"></script>
-<script src="document-page.js?v=qr-frame-soft-white-20261017"></script>
+<script src="document-page.js?v=pdf-fullhd-vector-20261022"></script>
 <script src="app.js"></script>
 
 <script src="/site-shell.js?v=20261017-signature1" defer></script>
